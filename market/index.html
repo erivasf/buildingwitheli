@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Researcher · Building with Eli</title>
+<meta name="description" content="Inteligencia de mercado real. En minutos. Gratis. Reporte de competidores y oportunidades para founders.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #e6e6e4;
+  --ink: #0f0f0f;
+  --ink2: #555;
+  --ink3: #999;
+  --neon: #ff4d00;
+  --neon-glow: rgba(255,77,0,0.2);
+  --border: rgba(0,0,0,0.1);
+  --border2: rgba(0,0,0,0.06);
+  --glass: rgba(255,255,255,0.55);
+  --display: 'Poppins', system-ui, sans-serif;
+  --mono: 'DM Mono', monospace;
+}
+
+html { background: var(--bg); color: var(--ink); font-family: var(--display); font-size: 16px; line-height: 1.6; cursor: none; overflow-x: hidden; }
+body { min-height: 100vh; position: relative; }
+
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px; opacity: 0.14; mix-blend-mode: multiply;
+}
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse at 15% 15%, rgba(255,255,255,0.95) 0%, transparent 52%),
+    radial-gradient(ellipse at 80% 85%, rgba(165,165,160,0.5) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(200,200,198,0.25) 0%, transparent 70%);
+}
+
+nav, main, footer { position: relative; z-index: 1; }
+
+/* Cursor */
+.cursor {
+  position: fixed; width: 7px; height: 7px;
+  background: var(--neon); border-radius: 50%;
+  pointer-events: none; z-index: 9999;
+  transform: translate(-50%,-50%);
+  transition: width .18s, height .18s;
+  box-shadow: 0 0 8px var(--neon), 0 0 20px var(--neon-glow);
+}
+.cursor-ring {
+  position: fixed; width: 28px; height: 28px;
+  border: 1px solid rgba(255,77,0,0.35); border-radius: 50%;
+  pointer-events: none; z-index: 9998;
+  transform: translate(-50%,-50%);
+  transition: width .15s, height .15s;
+}
+.cursor.hover { width: 11px; height: 11px; }
+.cursor-ring.hover { width: 40px; height: 40px; }
+
+/* Nav */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 1rem 2.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  background: rgba(230,230,228,0.7);
+  border-bottom: 1px solid var(--border2);
+}
+.nav-logo {
+  font-family: var(--display);
+  font-size: 13px; font-weight: 700;
+  letter-spacing: -0.01em; color: var(--ink); text-decoration: none;
+  display: inline-flex; align-items: center; gap: 7px;
+}
+.nav-logo .back { font-family: var(--mono); font-weight: 400; font-size: 14px; color: var(--ink3); transition: color .15s; }
+.nav-logo:hover .back { color: var(--neon); }
+
+.nav-clock {
+  font-family: var(--mono); font-size: 11px; font-weight: 300;
+  color: var(--ink2); letter-spacing: 0.04em; text-align: center; line-height: 1.5;
+}
+.nav-clock .date { color: var(--ink3); font-size: 10px; }
+
+.nav-links { display: flex; gap: 20px; }
+.nav-links a {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--ink2); text-decoration: none; letter-spacing: 0.05em; transition: color .15s;
+}
+.nav-links a:hover { color: var(--neon); }
+
+/* Layout */
+main { padding-top: 64px; max-width: 720px; margin: 0 auto; padding-left: 2.5rem; padding-right: 2.5rem; }
+
+/* Hero */
+.market-hero { padding: 5rem 0 2.5rem; }
+
+.market-tag {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.12em; color: var(--ink3);
+  text-transform: uppercase; margin-bottom: 1.25rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.market-tag::before { content: ''; display: inline-block; width: 14px; height: 1px; background: var(--ink3); }
+
+h1.market-title {
+  font-family: var(--display);
+  font-size: clamp(40px, 6vw, 64px);
+  font-weight: 900; line-height: 1;
+  color: var(--ink); margin-bottom: 0.45rem;
+  letter-spacing: -0.04em;
+}
+h1.market-title .accent { color: var(--neon); }
+
+.market-author {
+  font-family: var(--display);
+  font-size: 17px; font-weight: 300;
+  font-style: italic; color: var(--ink2);
+  margin-bottom: 1.75rem;
+  letter-spacing: -0.01em;
+}
+
+.market-sub {
+  font-family: var(--display); font-size: 18px; font-weight: 500;
+  color: var(--ink); margin-bottom: 1.75rem;
+  letter-spacing: -0.01em; line-height: 1.4;
+}
+
+.market-body { font-size: 14px; color: var(--ink2); font-weight: 300; line-height: 1.8; }
+.market-body p + p { margin-top: 1rem; }
+.market-body strong { color: var(--ink); font-weight: 600; }
+
+/* Form */
+.market-form-section { padding: 1.5rem 0 1rem; }
+
+.market-form {
+  background: var(--glass);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 12px;
+  padding: 2rem;
+  display: grid; gap: 1rem;
+}
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label {
+  font-family: var(--mono); font-size: 10px;
+  color: var(--ink3); letter-spacing: 0.08em; text-transform: uppercase;
+}
+.field input,
+.field select {
+  font-family: var(--display); font-size: 14px; font-weight: 300;
+  padding: 11px 14px;
+  background: rgba(255,255,255,0.7);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--ink); outline: none;
+  transition: border-color .15s, background .15s, box-shadow .15s;
+}
+.field input::placeholder { color: var(--ink3); }
+.field input:focus,
+.field select:focus {
+  background: rgba(255,255,255,0.95);
+  border-color: var(--neon);
+  box-shadow: 0 0 0 3px var(--neon-glow);
+}
+
+.field select {
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='%23555' stroke-width='1.5' d='M3 6l5 5 5-5'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+  padding-right: 36px;
+  cursor: none;
+}
+
+.market-cta {
+  font-family: var(--display); font-size: 14px; font-weight: 500;
+  letter-spacing: -0.005em;
+  padding: 14px 20px;
+  background: var(--ink); color: white;
+  border: 1px solid var(--ink);
+  border-radius: 4px; cursor: none;
+  transition: background .15s, border-color .15s, box-shadow .15s, transform .15s;
+  margin-top: 0.5rem;
+}
+.market-cta:hover { background: var(--neon); border-color: var(--neon); box-shadow: 0 0 18px var(--neon-glow); }
+.market-cta:active { transform: translateY(1px); }
+.market-cta:disabled { opacity: 0.55; }
+
+.market-note {
+  font-family: var(--mono); font-size: 10px;
+  color: var(--ink3); letter-spacing: 0.04em; text-align: center;
+  margin-top: 4px;
+}
+
+/* Steps */
+.market-steps { padding: 3rem 0 4rem; }
+
+.section-label {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.12em; color: var(--ink3); text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-label::before { content: ''; display: inline-block; width: 14px; height: 1px; background: var(--ink3); }
+
+.market-steps ol { list-style: none; display: grid; gap: 1rem; }
+.market-steps li {
+  display: flex; gap: 1rem; align-items: flex-start;
+  font-size: 14px; color: var(--ink); font-weight: 400; line-height: 1.5;
+}
+.market-steps li span {
+  font-family: var(--mono); font-size: 10px; color: var(--ink3);
+  letter-spacing: 0.07em; padding-top: 4px;
+  flex-shrink: 0;
+}
+
+/* Footer */
+footer {
+  position: relative; z-index: 1;
+  padding: 1.5rem 2.5rem; border-top: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.footer-left { font-family: var(--mono); font-size: 10px; color: var(--ink3); letter-spacing: 0.04em; }
+.footer-right { display: flex; gap: 20px; }
+.footer-right a { font-family: var(--mono); font-size: 10px; color: var(--ink3); text-decoration: none; letter-spacing: 0.04em; transition: color .15s; }
+.footer-right a:hover { color: var(--neon); }
+
+/* Modal */
+.modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+.modal[hidden] { display: none; }
+.modal-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(20,20,20,0.42);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.modal-content {
+  position: relative;
+  width: 100%; max-width: 420px;
+  background: rgba(245,245,243,0.96);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.8);
+  border-radius: 14px;
+  padding: 2rem;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+  animation: modalIn .2s ease;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.modal-close {
+  position: absolute; top: 10px; right: 10px;
+  width: 32px; height: 32px;
+  background: transparent; border: none; cursor: none;
+  font-size: 22px; color: var(--ink3); line-height: 1;
+  transition: color .15s;
+}
+.modal-close:hover { color: var(--neon); }
+.modal-tag {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.12em; color: var(--ink3);
+  text-transform: uppercase; margin-bottom: 0.85rem;
+}
+.modal-content h2 {
+  font-family: var(--display);
+  font-size: 22px; font-weight: 700;
+  color: var(--ink); margin-bottom: 0.45rem;
+  letter-spacing: -0.02em; line-height: 1.2;
+}
+.modal-intro {
+  font-size: 13px; color: var(--ink2); font-weight: 300;
+  margin-bottom: 1.5rem; line-height: 1.55;
+}
+
+#email-form { display: grid; gap: 0.9rem; }
+#email-form input[type="email"] {
+  font-family: var(--display); font-size: 14px; font-weight: 300;
+  padding: 11px 14px;
+  background: rgba(255,255,255,0.85);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--ink); outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+#email-form input[type="email"]:focus {
+  border-color: var(--neon);
+  box-shadow: 0 0 0 3px var(--neon-glow);
+}
+
+.checkbox {
+  display: flex; gap: 10px; align-items: flex-start;
+  font-size: 12px; color: var(--ink2); font-weight: 300;
+  line-height: 1.5; cursor: none;
+}
+.checkbox input { margin-top: 3px; cursor: none; accent-color: var(--neon); width: 14px; height: 14px; }
+.checkbox span { flex: 1; }
+
+#email-form button {
+  font-family: var(--display); font-size: 14px; font-weight: 500;
+  padding: 12px 18px;
+  background: var(--ink); color: white;
+  border: 1px solid var(--ink);
+  border-radius: 4px; cursor: none;
+  transition: background .15s, border-color .15s, box-shadow .15s;
+  margin-top: 0.25rem;
+}
+#email-form button:hover { background: var(--neon); border-color: var(--neon); box-shadow: 0 0 18px var(--neon-glow); }
+#email-form button:disabled { opacity: 0.55; }
+
+.modal-status {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--ink2); margin-top: 2px; letter-spacing: 0.04em;
+  text-align: center; min-height: 14px;
+}
+.modal-status.error { color: #c0392b; }
+.modal-status.success { color: var(--neon); }
+
+/* Fade-in */
+.fade-in { opacity: 0; transform: translateY(12px); transition: opacity .5s ease, transform .5s ease; }
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+
+/* Mobile */
+@media (max-width: 768px) {
+  nav { padding: 1rem 1.25rem; }
+  .nav-clock { display: none; }
+  main { padding-left: 1.25rem; padding-right: 1.25rem; }
+  .market-hero { padding: 4rem 0 2rem; }
+  .market-form { padding: 1.5rem; }
+  .market-steps { padding: 2rem 0 3rem; }
+  footer { flex-direction: column; gap: 8px; text-align: center; padding: 1.25rem; }
+}
+
+/* Touch devices */
+@media (hover: none) and (pointer: coarse) {
+  html { cursor: auto; }
+  .cursor, .cursor-ring { display: none !important; }
+  .market-cta, #email-form button, .modal-close, .checkbox, .checkbox input, .field select { cursor: pointer; }
+  .field input, #email-form input { cursor: text; }
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<nav>
+  <a href="/" class="nav-logo"><span class="back">←</span> Building with Eli</a>
+  <div class="nav-clock">
+    <div class="date" id="nav-date"></div>
+    <div id="nav-time"></div>
+  </div>
+  <div class="nav-links">
+    <a href="https://instagram.com/buildingwitheli" target="_blank">IG</a>
+    <a href="https://tiktok.com/@buildingwitheli" target="_blank">TikTok</a>
+  </div>
+</nav>
+
+<main>
+  <section class="market-hero fade-in">
+    <div class="market-tag">Herramienta · 01</div>
+    <h1 class="market-title">Market Researcher<span class="accent">.</span></h1>
+    <div class="market-author">by Elías Rivas</div>
+    <p class="market-sub">Inteligencia de mercado real. En minutos. Gratis.</p>
+    <div class="market-body">
+      <p>La mayoría de founders empieza a construir sin entender el terreno.</p>
+      <p>Este reporte te dice quién está en tu mercado, qué están haciendo bien o mal, dónde hay espacio real, y qué deberías hacer esta semana.</p>
+      <p>El mismo sistema que uso para mis startups.</p>
+    </div>
+  </section>
+
+  <section class="market-form-section fade-in" style="transition-delay:.1s">
+    <form id="market-form" class="market-form" novalidate>
+      <div class="field">
+        <label for="brand">Marca</label>
+        <input type="text" id="brand" name="brand" required placeholder="Tu empresa">
+      </div>
+      <div class="field">
+        <label for="url">URL</label>
+        <input type="url" id="url" name="url" required placeholder="https://tuempresa.com">
+      </div>
+      <div class="field">
+        <label for="industry">Industria</label>
+        <input type="text" id="industry" name="industry" required placeholder="Ecommerce, SaaS, fintech, etc.">
+      </div>
+      <div class="field">
+        <label for="comp1">Competidor 1</label>
+        <input type="text" id="comp1" name="comp1" required placeholder="Nombre o URL">
+      </div>
+      <div class="field">
+        <label for="comp2">Competidor 2</label>
+        <input type="text" id="comp2" name="comp2" placeholder="Nombre o URL (opcional)">
+      </div>
+      <div class="field">
+        <label for="comp3">Competidor 3</label>
+        <input type="text" id="comp3" name="comp3" placeholder="Nombre o URL (opcional)">
+      </div>
+      <div class="field">
+        <label for="frequency">Frecuencia</label>
+        <select id="frequency" name="frequency">
+          <option value="weekly">Semanal</option>
+          <option value="monthly">Mensual</option>
+        </select>
+      </div>
+      <button type="submit" class="market-cta">→ Generar mi reporte</button>
+      <p class="market-note">Gratis. Sin registro. Sin spam.</p>
+    </form>
+  </section>
+
+  <section class="market-steps fade-in" style="transition-delay:.16s">
+    <div class="section-label">Cómo usarlo</div>
+    <ol>
+      <li><span>01</span> Llena los datos de tu negocio y competidores.</li>
+      <li><span>02</span> Elige frecuencia: semanal o mensual.</li>
+      <li><span>03</span> Descarga tu reporte en PDF.</li>
+    </ol>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-left">Una herramienta de buildingwitheli.com</div>
+  <div class="footer-right">
+    <a href="https://instagram.com/buildingwitheli" target="_blank">@buildingwitheli</a>
+  </div>
+</footer>
+
+<!-- Email modal -->
+<div class="modal" id="email-modal" hidden>
+  <div class="modal-backdrop" id="modal-backdrop"></div>
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <button class="modal-close" id="modal-close" type="button" aria-label="Cerrar">×</button>
+    <div class="modal-tag">Último paso</div>
+    <h2 id="modal-title">Te envío el reporte por correo</h2>
+    <p class="modal-intro">Déjame tu email y te mando el PDF apenas esté listo.</p>
+    <form id="email-form" novalidate>
+      <input type="email" name="email" required placeholder="tu@email.com" autocomplete="email">
+      <label class="checkbox">
+        <input type="checkbox" name="subscribe" checked>
+        <span>Quiero recibir herramientas de IA cada semana. Sin spam.</span>
+      </label>
+      <button type="submit" id="email-submit">→ Enviar reporte</button>
+      <div class="modal-status" id="modal-status" aria-live="polite"></div>
+    </form>
+  </div>
+</div>
+
+<script>
+// Clock
+function updateClock() {
+  const tz = 'America/Mexico_City';
+  const now = new Date();
+  document.getElementById('nav-date').textContent = now.toLocaleDateString('es-MX', { weekday:'short', month:'short', day:'numeric', timeZone: tz });
+  document.getElementById('nav-time').textContent = now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', second:'2-digit', timeZone: tz, hour12: false }) + ' CDT';
+}
+updateClock(); setInterval(updateClock, 1000);
+
+// Cursor
+const cur = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e => {
+  mx=e.clientX; my=e.clientY;
+  cur.style.left=mx+'px'; cur.style.top=my+'px';
+});
+(function anim(){ rx+=(mx-rx)*.1; ry+=(my-ry)*.1; ring.style.left=rx+'px'; ring.style.top=ry+'px'; requestAnimationFrame(anim); })();
+function bindHover(scope=document) {
+  scope.querySelectorAll('a,button,input,select,label').forEach(el=>{
+    if (el.dataset.hb) return; el.dataset.hb = '1';
+    el.addEventListener('mouseenter',()=>{ cur.classList.add('hover'); ring.classList.add('hover'); });
+    el.addEventListener('mouseleave',()=>{ cur.classList.remove('hover'); ring.classList.remove('hover'); });
+  });
+}
+bindHover();
+
+// Fade in
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); }});
+}, {threshold:.08});
+document.querySelectorAll('.fade-in').forEach(f=>obs.observe(f));
+
+// Form → Modal flow
+const marketForm = document.getElementById('market-form');
+const modal = document.getElementById('email-modal');
+const modalClose = document.getElementById('modal-close');
+const modalBackdrop = document.getElementById('modal-backdrop');
+const emailForm = document.getElementById('email-form');
+const emailSubmit = document.getElementById('email-submit');
+const modalStatus = document.getElementById('modal-status');
+
+let pendingPayload = null;
+
+marketForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const fd = new FormData(marketForm);
+  const brand = (fd.get('brand') || '').trim();
+  const url = (fd.get('url') || '').trim();
+  const industry = (fd.get('industry') || '').trim();
+  const comp1 = (fd.get('comp1') || '').trim();
+  if (!brand || !url || !industry || !comp1) {
+    alert('Llena los campos requeridos: marca, URL, industria y al menos un competidor.');
+    return;
+  }
+  pendingPayload = {
+    brand, url, industry,
+    comp1,
+    comp2: (fd.get('comp2') || '').trim(),
+    comp3: (fd.get('comp3') || '').trim(),
+    frequency: fd.get('frequency') || 'weekly',
+  };
+  openModal();
+});
+
+function openModal() {
+  modal.hidden = false;
+  modalStatus.textContent = '';
+  modalStatus.className = 'modal-status';
+  emailSubmit.disabled = false;
+  emailSubmit.textContent = '→ Enviar reporte';
+  bindHover(modal);
+  setTimeout(() => {
+    const input = modal.querySelector('input[type="email"]');
+    if (input) input.focus();
+  }, 30);
+}
+function closeModal() {
+  modal.hidden = true;
+}
+
+modalClose.addEventListener('click', closeModal);
+modalBackdrop.addEventListener('click', closeModal);
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
+
+emailForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!pendingPayload) { closeModal(); return; }
+
+  const fd = new FormData(emailForm);
+  const email = (fd.get('email') || '').trim();
+  const subscribe = fd.get('subscribe') === 'on';
+
+  if (!email || !/.+@.+\..+/.test(email)) {
+    modalStatus.textContent = 'Ingresa un correo válido.';
+    modalStatus.className = 'modal-status error';
+    return;
+  }
+
+  emailSubmit.disabled = true;
+  emailSubmit.textContent = 'Generando...';
+  modalStatus.textContent = '';
+  modalStatus.className = 'modal-status';
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...pendingPayload, email, subscribe }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Algo falló. Intenta de nuevo.');
+
+    modalStatus.textContent = data.message || 'Listo. Te enviamos el reporte a tu correo.';
+    modalStatus.className = 'modal-status success';
+    emailSubmit.textContent = 'Enviado';
+    emailForm.reset();
+    setTimeout(closeModal, 3800);
+  } catch (err) {
+    modalStatus.textContent = err.message || 'Error. Intenta de nuevo.';
+    modalStatus.className = 'modal-status error';
+    emailSubmit.disabled = false;
+    emailSubmit.textContent = '→ Enviar reporte';
+  }
+});
+</script>
+</body>
+</html>

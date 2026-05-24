@@ -228,20 +228,15 @@ h1 .accent { color: var(--neon); }
   padding: 1.5rem;
   display: flex; flex-direction: column;
   text-decoration: none;
-  transition: background .2s;
+  transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
   overflow: hidden;
 }
 
-.card-3d::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 2px;
-  background: var(--neon);
-  box-shadow: 0 0 12px var(--neon);
-  opacity: 0; transition: opacity .3s;
+.card-3d:hover {
+  background: rgba(255,255,255,0.65);
+  border-color: var(--neon);
+  box-shadow: 0 0 14px var(--neon-glow);
 }
-
-.card-3d:hover { background: var(--glass-hover); }
-.card-3d:hover::before { opacity: 1; }
 
 /* Position each card around the circle */
 .card-3d:nth-child(1) { transform: rotateY(0deg)   translateZ(320px); }
