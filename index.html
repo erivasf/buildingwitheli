@@ -212,15 +212,8 @@ h1 .accent { color: var(--neon); }
   position: relative;
   width: 260px; height: 260px;
   transform-style: preserve-3d;
-  animation: spin3d 18s linear infinite;
   will-change: transform;
-}
-
-.carousel-3d:hover { animation-play-state: paused; }
-
-@keyframes spin3d {
-  from { transform: rotateY(0deg); }
-  to   { transform: rotateY(-360deg); }
+  touch-action: pan-y;
 }
 
 .card-3d {
@@ -331,6 +324,13 @@ footer {
   .card-3d:nth-child(3) { transform: rotateY(180deg) translateZ(240px); }
   .card-3d:nth-child(4) { transform: rotateY(270deg) translateZ(240px); }
   footer { flex-direction: column; gap: 8px; text-align: center; }
+}
+
+/* Touch devices: drop the custom cursor entirely */
+@media (hover: none) and (pointer: coarse) {
+  html { cursor: auto; }
+  .cursor, .cursor-ring { display: none !important; }
+  .subscribe-form button { cursor: pointer; }
 }
 </style>
 </head>
@@ -497,50 +497,99 @@ function handleSubscribe() {
   input.value = ''; input.disabled = true;
 }
 
-// Drag to rotate carousel
+// 3D carousel — rAF spin, drag, momentum
 const c3d = document.getElementById('carousel3d');
-let isDragging = false, startX = 0, currentAngle = 0, dragAngle = 0;
-let animPaused = false;
+const wrap = document.querySelector('.carousel-3d-wrap');
+
+let currentAngle = 0;
+let velocity = 0;          // deg/ms — momentum after a release
+let isDragging = false;
+let autoPaused = false;    // desktop hover pauses auto-spin
+let dragStartAngle = 0;
+let mouseStartX = 0;
+let touchStartX = 0, touchStartY = 0;
+let touchDecided = false;
+let lastMoveX = 0, lastMoveTime = 0;
+const AUTO_SPEED = -360 / 18000; // deg/ms — same cadence as before
+
+let lastFrame = 0;
+function spinFrame(t) {
+  if (!lastFrame) lastFrame = t;
+  const dt = Math.min(t - lastFrame, 50);
+  lastFrame = t;
+
+  if (!isDragging) {
+    if (Math.abs(velocity) > 0.002) {
+      currentAngle += velocity * dt;
+      velocity *= Math.pow(0.94, dt / 16);
+    } else {
+      velocity = 0;
+      if (!autoPaused) currentAngle += AUTO_SPEED * dt;
+    }
+  }
+
+  c3d.style.transform = `rotateY(${currentAngle}deg)`;
+  requestAnimationFrame(spinFrame);
+}
+requestAnimationFrame(spinFrame);
+
+wrap.addEventListener('mouseenter', () => { autoPaused = true; });
+wrap.addEventListener('mouseleave', () => { autoPaused = false; });
 
 c3d.addEventListener('mousedown', e => {
-  isDragging = true; startX = e.clientX; dragAngle = currentAngle;
-  c3d.style.animationPlayState = 'paused';
-  animPaused = true;
+  isDragging = true;
+  mouseStartX = e.clientX;
+  dragStartAngle = currentAngle;
+  velocity = 0;
+  e.preventDefault();
 });
-
 document.addEventListener('mousemove', e => {
   if (!isDragging) return;
-  const delta = (e.clientX - startX) * 0.4;
-  currentAngle = dragAngle - delta;
-  c3d.style.animation = 'none';
-  c3d.style.transform = `rotateY(${currentAngle}deg)`;
+  const dx = e.clientX - mouseStartX;
+  currentAngle = dragStartAngle - dx * 0.4;
 });
-
 document.addEventListener('mouseup', () => {
   if (!isDragging) return;
   isDragging = false;
-  // Resume auto-spin from current angle
-  c3d.style.animation = '';
-  c3d.style.animationPlayState = 'running';
 });
 
-// Touch support
 c3d.addEventListener('touchstart', e => {
-  startX = e.touches[0].clientX; dragAngle = currentAngle;
-  c3d.style.animationPlayState = 'paused';
+  const t = e.touches[0];
+  touchStartX = t.clientX;
+  touchStartY = t.clientY;
+  touchDecided = false;
+  isDragging = true;
+  dragStartAngle = currentAngle;
+  velocity = 0;
+  lastMoveX = touchStartX;
+  lastMoveTime = performance.now();
 }, { passive: true });
 
 c3d.addEventListener('touchmove', e => {
-  const delta = (e.touches[0].clientX - startX) * 0.4;
-  currentAngle = dragAngle - delta;
-  c3d.style.animation = 'none';
-  c3d.style.transform = `rotateY(${currentAngle}deg)`;
-}, { passive: true });
+  if (!isDragging) return;
+  const t = e.touches[0];
+  const dx = t.clientX - touchStartX;
+  const dy = t.clientY - touchStartY;
 
-c3d.addEventListener('touchend', () => {
-  c3d.style.animation = '';
-  c3d.style.animationPlayState = 'running';
-});
+  if (!touchDecided) {
+    if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+    if (Math.abs(dy) > Math.abs(dx)) { isDragging = false; return; }
+    touchDecided = true;
+  }
+
+  if (e.cancelable) e.preventDefault();
+
+  currentAngle = dragStartAngle + dx * 0.5;
+
+  const now = performance.now();
+  const ddt = now - lastMoveTime;
+  if (ddt > 0) velocity = ((t.clientX - lastMoveX) * 0.5) / ddt;
+  lastMoveX = t.clientX;
+  lastMoveTime = now;
+}, { passive: false });
+
+c3d.addEventListener('touchend', () => { isDragging = false; });
+c3d.addEventListener('touchcancel', () => { isDragging = false; });
 </script>
 </body>
 </html>
