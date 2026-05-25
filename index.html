@@ -213,6 +213,21 @@ h1 .accent { color: var(--neon); }
   font-family: var(--mono); font-size: 10px;
   color: var(--ink3); letter-spacing: 0.08em; text-transform: uppercase;
 }
+.stat-bullets {
+  list-style: none; margin: 14px 0 0; padding: 0;
+}
+.stat-bullets li {
+  display: flex; align-items: baseline; gap: 7px;
+  font-family: var(--mono); font-size: 10px; font-weight: 400;
+  color: var(--ink2); letter-spacing: 0.01em; line-height: 1.5;
+  margin-bottom: 4px;
+}
+.stat-bullets li:last-child { margin-bottom: 0; }
+.stat-bullets li::before {
+  content: '→';
+  color: var(--neon);
+  flex-shrink: 0;
+}
 .side-line { display: none; }
 
 /* Section divider */
@@ -458,6 +473,12 @@ footer {
       <div class="side-stat">
         <div class="side-stat-num">1<span class="unit">/52</span></div>
         <div class="side-stat-label">Semana</div>
+        <ul class="stat-bullets">
+          <li>5,000+ conversaciones con usuarios</li>
+          <li>100+ entrevistas</li>
+          <li>10 usuarios activos</li>
+          <li>Lanzamiento: jun 2026</li>
+        </ul>
       </div>
       <div class="side-stat">
         <div class="side-stat-num">Gratis</div>
