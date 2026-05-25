@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Building with Eli</title>
-<link rel="icon" type="image/jpeg" href="/favicon.jpeg">
-<link rel="apple-touch-icon" href="/favicon.jpeg">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
@@ -75,11 +76,15 @@ nav, main, footer { position: relative; z-index: 1; }
 /* Nav */
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  padding: 1rem 2.5rem;
-  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 0;
   backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
   background: rgba(230,230,228,0.7);
   border-bottom: 1px solid var(--border2);
+}
+.nav-inner {
+  max-width: 1100px; margin: 0 auto;
+  padding: 0 2.5rem;
+  display: flex; align-items: center; justify-content: space-between;
 }
 
 .nav-logo {
@@ -102,7 +107,7 @@ main { padding-top: 64px; }
   padding: 6rem 2.5rem 5rem;
   max-width: 1100px; margin: 0 auto;
   display: grid; grid-template-columns: 1fr 240px;
-  gap: 5rem; align-items: end;
+  gap: 5rem; align-items: stretch;
 }
 
 .hero-tag {
@@ -115,8 +120,8 @@ main { padding-top: 64px; }
 
 h1 {
   font-family: var(--display);
-  font-size: clamp(46px, 6.5vw, 80px);
-  font-weight: 900; line-height: 0.96;
+  font-size: clamp(44px, 5.6vw, 68px);
+  font-weight: 900; line-height: 1.02;
   color: var(--ink); margin-bottom: 1.75rem;
   letter-spacing: -0.04em;
 }
@@ -163,10 +168,13 @@ h1 .accent { color: var(--neon); }
 }
 
 /* Hero right */
-.hero-right { border-left: 1px solid var(--border); padding-left: 2.5rem; }
+.hero-right {
+  border-left: 1px solid var(--border); padding-left: 2.5rem;
+  display: flex; flex-direction: column; justify-content: space-between;
+  gap: 1.5rem;
+}
 
-.side-stat { margin-bottom: 1.5rem; }
-.side-stat:last-child { margin-bottom: 0; }
+.side-stat { margin-bottom: 0; }
 
 .side-stat-num {
   font-family: var(--display);
@@ -179,7 +187,7 @@ h1 .accent { color: var(--neon); }
   font-family: var(--mono); font-size: 10px;
   color: var(--ink3); letter-spacing: 0.08em; text-transform: uppercase;
 }
-.side-line { width: 18px; height: 1px; background: var(--border); margin: 1.1rem 0; }
+.side-line { display: none; }
 
 /* Section divider */
 .section-divider { max-width: 1100px; margin: 0 auto; padding: 0 2.5rem; border-top: 1px solid var(--border2); }
@@ -290,7 +298,11 @@ h1 .accent { color: var(--neon); }
 /* Footer */
 footer {
   position: relative; z-index: 1;
-  padding: 1.5rem 2.5rem; border-top: 1px solid var(--border2);
+  padding: 1.5rem 0; border-top: 1px solid var(--border2);
+}
+.footer-inner {
+  max-width: 1100px; margin: 0 auto;
+  padding: 0 2.5rem;
   display: flex; align-items: center; justify-content: space-between;
 }
 .footer-left { font-family: var(--mono); font-size: 10px; color: var(--ink3); letter-spacing: 0.04em; }
@@ -304,7 +316,8 @@ footer {
 
 /* Mobile */
 @media (max-width: 768px) {
-  nav { padding: 1rem 1.25rem; }
+  nav { padding: 1rem 0; }
+  .nav-inner { padding: 0 1.25rem; }
   .hero { grid-template-columns: 1fr; gap: 2.5rem; padding: 5rem 1.25rem 3rem; }
   .hero-right { border-left: none; border-top: 1px solid var(--border); padding-left: 0; padding-top: 1.5rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
   .side-line { display: none; }
@@ -313,7 +326,8 @@ footer {
   .card-3d:nth-child(2) { transform: rotateY(90deg)  translateZ(240px); }
   .card-3d:nth-child(3) { transform: rotateY(180deg) translateZ(240px); }
   .card-3d:nth-child(4) { transform: rotateY(270deg) translateZ(240px); }
-  footer { flex-direction: column; gap: 8px; text-align: center; }
+  footer { padding: 1.25rem 0; }
+  .footer-inner { padding: 0 1.25rem; flex-direction: column; gap: 8px; text-align: center; }
 }
 
 /* Newsletter modal */
@@ -374,10 +388,12 @@ footer {
 <div class="cursor-ring" id="cursor-ring"></div>
 
 <nav>
-  <a href="/" class="nav-logo">Building with Eli</a>
-  <div class="nav-links">
-    <a href="https://instagram.com/buildingwitheli" target="_blank">IG</a>
-    <a href="https://tiktok.com/@buildingwitheli" target="_blank">TikTok</a>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Building with Eli</a>
+    <div class="nav-links">
+      <a href="https://instagram.com/buildingwitheli" target="_blank">IG</a>
+      <a href="https://tiktok.com/@buildingwitheli" target="_blank">TikTok</a>
+    </div>
   </div>
 </nav>
 
@@ -385,7 +401,7 @@ footer {
   <section class="hero">
     <div class="hero-left fade-in">
       <div class="hero-tag">Ciudad de México · 2026</div>
-      <h1>Construyendo<br><span class="thin">en público</span><span class="accent">.</span><br><span class="thin">No</span> teoría<span class="accent">.</span><br><span class="thin">No</span> cursos<span class="accent">.</span></h1>
+      <h1>Construyendo<br><span class="thin">en público</span><span class="accent">.</span><br><span class="thin">No</span> teoría<span class="accent">.</span> <span class="thin">No</span> cursos<span class="accent">.</span></h1>
       <p class="hero-sub">
         Lo que hago cada semana para construir un negocio de <strong>$1M USD</strong>.
       </p>
@@ -488,10 +504,12 @@ footer {
 </div>
 
 <footer>
-  <div class="footer-left">Ciudad de México · 2025 · buildingwitheli.com</div>
-  <div class="footer-right">
-    <a href="https://instagram.com/buildingwitheli" target="_blank">Instagram</a>
-    <a href="https://tiktok.com/@buildingwitheli" target="_blank">TikTok</a>
+  <div class="footer-inner">
+    <div class="footer-left">Ciudad de México · 2025 · buildingwitheli.com</div>
+    <div class="footer-right">
+      <a href="https://instagram.com/buildingwitheli" target="_blank">Instagram</a>
+      <a href="https://tiktok.com/@buildingwitheli" target="_blank">TikTok</a>
+    </div>
   </div>
 </footer>
 
