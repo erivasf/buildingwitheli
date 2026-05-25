@@ -304,7 +304,7 @@ footer {
 @media (max-width: 768px) {
   nav { padding: 1rem 1.25rem; }
   .hero { grid-template-columns: 1fr; gap: 2.5rem; padding: 5rem 1.25rem 3rem; }
-  .hero-right { border-left: none; border-top: 1px solid var(--border); padding-left: 0; padding-top: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; }
+  .hero-right { border-left: none; border-top: 1px solid var(--border); padding-left: 0; padding-top: 1.5rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
   .side-line { display: none; }
   .card-3d { width: 200px; height: 200px; margin-left: -100px; margin-top: -100px; }
   .card-3d:nth-child(1) { transform: rotateY(0deg)   translateZ(240px); }
@@ -382,12 +382,10 @@ footer {
 <main>
   <section class="hero">
     <div class="hero-left fade-in">
-      <div class="hero-tag">Ciudad de México · Founder · Growth</div>
-      <h1>Construyo<br><span class="thin">empresas</span><span class="accent">.</span><br>Documento<br><span class="thin">todo</span><span class="accent">.</span></h1>
+      <div class="hero-tag">Ciudad de México · 2026</div>
+      <h1>Construyendo<br><span class="thin">en público</span><span class="accent">.</span><br><span class="thin">No</span> teoría<span class="accent">.</span><br><span class="thin">No</span> cursos<span class="accent">.</span></h1>
       <p class="hero-sub">
-        6 años en ecommerce por todo LATAM — desde Seed hasta Series D.
-        Ahora construyo mi segunda startup con una <strong>meta de $1M en el primer año.</strong>
-        Comparto lo que funciona — y lo que no.
+        Lo que hago cada semana para construir un negocio de <strong>$1M USD</strong>.
       </p>
       <div class="subscribe-label">Newsletter — semanal, en español</div>
       <div class="subscribe-form">
@@ -399,23 +397,18 @@ footer {
 
     <div class="hero-right fade-in" style="transition-delay:.12s">
       <div class="side-stat">
-        <div class="side-stat-num">6<span class="unit"> años</span></div>
-        <div class="side-stat-label">Ecommerce & growth</div>
+        <div class="side-stat-num">1<span class="unit">/52</span></div>
+        <div class="side-stat-label">Semana en curso</div>
       </div>
       <div class="side-line"></div>
       <div class="side-stat">
-        <div class="side-stat-num">5k<span class="unit">+</span></div>
-        <div class="side-stat-label">Conversaciones con usuarios</div>
+        <div class="side-stat-num">Gratis</div>
+        <div class="side-stat-label">Todos los recursos</div>
       </div>
       <div class="side-line"></div>
       <div class="side-stat">
-        <div class="side-stat-num">Seed<span class="unit"> → D</span></div>
-        <div class="side-stat-label">Etapas trabajadas</div>
-      </div>
-      <div class="side-line"></div>
-      <div class="side-stat">
-        <div class="side-stat-num" id="reader-count">—</div>
-        <div class="side-stat-label">Lectores del newsletter</div>
+        <div class="side-stat-num">No<span class="unit"> vendo</span></div>
+        <div class="side-stat-label">Cursos</div>
       </div>
     </div>
   </section>
