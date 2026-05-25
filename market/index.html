@@ -155,7 +155,8 @@ h1.market-title .accent { color: var(--neon); }
   color: var(--ink3); letter-spacing: 0.08em; text-transform: uppercase;
 }
 .field input,
-.field select {
+.field select,
+.field textarea {
   font-family: var(--display); font-size: 14px; font-weight: 300;
   padding: 11px 14px;
   background: rgba(255,255,255,0.7);
@@ -164,12 +165,19 @@ h1.market-title .accent { color: var(--neon); }
   color: var(--ink); outline: none;
   transition: border-color .15s, background .15s, box-shadow .15s;
 }
-.field input::placeholder { color: var(--ink3); }
+.field input::placeholder,
+.field textarea::placeholder { color: var(--ink3); }
 .field input:focus,
-.field select:focus {
+.field select:focus,
+.field textarea:focus {
   background: rgba(255,255,255,0.95);
   border-color: var(--neon);
   box-shadow: 0 0 0 3px var(--neon-glow);
+}
+.field textarea {
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 140px;
 }
 
 .field select {
@@ -350,7 +358,7 @@ footer {
   html { cursor: auto; }
   .cursor, .cursor-ring { display: none !important; }
   .market-cta, #email-form button, .modal-close, .checkbox, .checkbox input, .field select { cursor: pointer; }
-  .field input, #email-form input { cursor: text; }
+  .field input, .field textarea, #email-form input { cursor: text; }
 }
 </style>
 </head>
@@ -407,6 +415,12 @@ footer {
       <div class="field">
         <label for="comp3">Competidor 3</label>
         <input type="text" id="comp3" name="comp3" placeholder="Nombre o URL (opcional)">
+      </div>
+      <div class="field">
+        <label for="objetivo">Objetivo de negocio</label>
+        <textarea id="objetivo" name="objetivo" required rows="6" placeholder="Ej: Estoy evaluando si hay espacio para entrar al mercado de cafés de especialidad en CDMX con un modelo de suscripción mensual. Quiero entender qué están haciendo los competidores locales y si hay un ángulo sin explotar.
+
+Ej: Tengo una app de finanzas personales en etapa de validación en Colombia. Busco entender el comportamiento del consumidor y qué canales están usando los competidores para adquirir usuarios."></textarea>
       </div>
       <button type="submit" class="market-cta">→ Generar mi reporte</button>
       <p class="market-note">Gratis. Sin spam.</p>
@@ -495,8 +509,9 @@ marketForm.addEventListener('submit', e => {
   const url = (fd.get('url') || '').trim();
   const industry = (fd.get('industry') || '').trim();
   const comp1 = (fd.get('comp1') || '').trim();
-  if (!brand || !url || !industry || !comp1) {
-    alert('Llena los campos requeridos: marca, URL, industria y al menos un competidor.');
+  const objetivo = (fd.get('objetivo') || '').trim();
+  if (!brand || !url || !industry || !comp1 || !objetivo) {
+    alert('Llena los campos requeridos: marca, URL, industria, competidor y objetivo de negocio.');
     return;
   }
   pendingPayload = {
@@ -504,6 +519,7 @@ marketForm.addEventListener('submit', e => {
     comp1,
     comp2: (fd.get('comp2') || '').trim(),
     comp3: (fd.get('comp3') || '').trim(),
+    objetivo,
   };
   openModal();
 });

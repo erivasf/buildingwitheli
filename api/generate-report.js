@@ -49,6 +49,7 @@ function buildUserMessage(input) {
     `Competidor 2: ${input.comp2 || '(no especificado)'}`,
     `Competidor 3: ${input.comp3 || '(no especificado)'}`,
     `Fecha del reporte: ${new Date().toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' })}`,
+    `Objetivo de negocio: ${input.objetivo}`,
   ].join('\n');
 }
 
@@ -185,8 +186,16 @@ export default async function handler(req, res) {
   if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
   body = body || {};
 
-  const { brand, url, industry, comp1, comp2 = '', comp3 = '', email, subscribe = true } = body;
+  const {
+    brand, url, industry,
+    comp1, comp2 = '', comp3 = '',
+    objetivo = '',
+    email, subscribe = true,
+  } = body;
 
+  if (!objetivo || !String(objetivo).trim()) {
+    return res.status(400).json({ success: false, error: 'El objetivo de negocio es requerido para generar el reporte.' });
+  }
   if (!brand || !url || !industry || !comp1 || !email) {
     return res.status(400).json({ success: false, error: 'Faltan campos requeridos.' });
   }
@@ -197,7 +206,7 @@ export default async function handler(req, res) {
   // Step 1: Claude
   let reportMd;
   try {
-    reportMd = await callClaude({ brand, url, industry, comp1, comp2, comp3 });
+    reportMd = await callClaude({ brand, url, industry, comp1, comp2, comp3, objetivo: String(objetivo).trim() });
   } catch (err) {
     console.error('[step:claude]', err);
     return res.status(500).json({ success: false, error: 'Falló la generación del reporte (Claude).' });
