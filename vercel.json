@@ -1,6 +1,13 @@
 {
   "cleanUrls": true,
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "functions": {
+    "api/generate-report.js": {
+      "maxDuration": 60,
+      "memory": 1024,
+      "includeFiles": "system-prompt.txt"
+    }
+  },
   "headers": [{
     "source": "/(.*)",
     "headers": [

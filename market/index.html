@@ -559,7 +559,7 @@ emailForm.addEventListener('submit', async e => {
   modalStatus.className = 'modal-status';
 
   try {
-    const res = await fetch('/api/generate', {
+    const res = await fetch('/api/generate-report', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...pendingPayload, email, subscribe }),

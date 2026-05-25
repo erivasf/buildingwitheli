@@ -1,4 +1,16 @@
 {
   "name": "buildingwitheli",
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.65.0",
+    "@sparticuz/chromium": "^131.0.1",
+    "marked": "^14.1.4",
+    "puppeteer-core": "^23.11.1",
+    "resend": "^4.8.0"
+  }
 }
