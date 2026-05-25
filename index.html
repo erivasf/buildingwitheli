@@ -86,12 +86,6 @@ nav {
   letter-spacing: -0.01em; color: var(--ink); text-decoration: none;
 }
 
-.nav-clock {
-  font-family: var(--mono); font-size: 11px; font-weight: 300;
-  color: var(--ink2); letter-spacing: 0.04em; text-align: center; line-height: 1.5;
-}
-.nav-clock .date { color: var(--ink3); font-size: 10px; }
-
 .nav-links { display: flex; gap: 20px; }
 .nav-links a {
   font-family: var(--mono); font-size: 11px;
@@ -309,7 +303,6 @@ footer {
 /* Mobile */
 @media (max-width: 768px) {
   nav { padding: 1rem 1.25rem; }
-  .nav-clock { display: none; }
   .hero { grid-template-columns: 1fr; gap: 2.5rem; padding: 5rem 1.25rem 3rem; }
   .hero-right { border-left: none; border-top: 1px solid var(--border); padding-left: 0; padding-top: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; }
   .side-line { display: none; }
@@ -321,11 +314,55 @@ footer {
   footer { flex-direction: column; gap: 8px; text-align: center; }
 }
 
+/* Newsletter modal */
+.modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+.modal[hidden] { display: none; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(20,20,20,0.42); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.modal-content {
+  position: relative; width: 100%; max-width: 420px;
+  background: rgba(245,245,243,0.96);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.8);
+  border-radius: 14px; padding: 2rem;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+  animation: modalIn .2s ease;
+}
+@keyframes modalIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.modal-close { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; background: transparent; border: none; cursor: none; font-size: 22px; color: var(--ink3); line-height: 1; transition: color .15s; }
+.modal-close:hover { color: var(--neon); }
+.modal-tag { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--ink3); text-transform: uppercase; margin-bottom: 0.85rem; }
+.modal-content h2 { font-family: var(--display); font-size: 22px; font-weight: 700; color: var(--ink); margin-bottom: 0.45rem; letter-spacing: -0.02em; line-height: 1.2; }
+.modal-intro { font-size: 13px; color: var(--ink2); font-weight: 300; margin-bottom: 1.4rem; line-height: 1.55; }
+#nl-form { display: grid; gap: 0.85rem; }
+#nl-form input[type="email"] {
+  font-family: var(--display); font-size: 14px; font-weight: 300;
+  padding: 11px 14px;
+  background: rgba(255,255,255,0.85);
+  border: 1px solid var(--border); border-radius: 4px;
+  color: var(--ink); outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+#nl-form input[type="email"]:focus { border-color: var(--neon); box-shadow: 0 0 0 3px var(--neon-glow); }
+#nl-form button {
+  font-family: var(--display); font-size: 14px; font-weight: 500;
+  padding: 12px 18px;
+  background: var(--ink); color: white;
+  border: 1px solid var(--ink);
+  border-radius: 4px; cursor: none;
+  transition: background .15s, border-color .15s, box-shadow .15s;
+}
+#nl-form button:hover { background: var(--neon); border-color: var(--neon); box-shadow: 0 0 18px var(--neon-glow); }
+#nl-form button:disabled { opacity: 0.55; }
+.modal-status { font-family: var(--mono); font-size: 11px; color: var(--ink2); letter-spacing: 0.04em; text-align: center; min-height: 14px; }
+.modal-status.error { color: #c0392b; }
+.modal-status.success { color: #1a7a4a; }
+
 /* Touch devices: drop the custom cursor entirely */
 @media (hover: none) and (pointer: coarse) {
   html { cursor: auto; }
   .cursor, .cursor-ring { display: none !important; }
-  .subscribe-form button { cursor: pointer; }
+  .subscribe-form button, .modal-close, #nl-form button { cursor: pointer; }
+  #nl-form input { cursor: text; }
 }
 </style>
 </head>
@@ -336,10 +373,6 @@ footer {
 
 <nav>
   <a href="/" class="nav-logo">Building with Eli</a>
-  <div class="nav-clock">
-    <div class="date" id="nav-date"></div>
-    <div id="nav-time"></div>
-  </div>
   <div class="nav-links">
     <a href="https://instagram.com/buildingwitheli" target="_blank">IG</a>
     <a href="https://tiktok.com/@buildingwitheli" target="_blank">TikTok</a>
@@ -428,14 +461,14 @@ footer {
           <div class="card-cta-3d">Próximamente</div>
         </a>
 
-        <a href="#" class="card-3d">
+        <a href="#suscribirme" class="card-3d" data-modal="newsletter">
           <div class="card-top-3d">
             <div class="card-num-3d">04</div>
-            <span class="status soon">Próximamente</span>
+            <span class="status live">En vivo</span>
           </div>
           <div class="card-title-3d">Newsletter</div>
           <div class="card-desc-3d">Semanal en español. Growth y ecommerce aplicado a negocios reales. Sin teoría, sin estrategia de redes. Decisiones y números reales.</div>
-          <div class="card-cta-3d">Suscribirte arriba</div>
+          <div class="card-cta-3d">Suscribirme</div>
         </a>
 
       </div>
@@ -443,6 +476,21 @@ footer {
 
   </section>
 </main>
+
+<div class="modal" id="nl-modal" hidden>
+  <div class="modal-backdrop" id="nl-backdrop"></div>
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="nl-title">
+    <button class="modal-close" id="nl-close" type="button" aria-label="Cerrar">×</button>
+    <div class="modal-tag">Newsletter</div>
+    <h2 id="nl-title">Suscríbete</h2>
+    <p class="modal-intro">Semanal, en español. Growth, ecommerce y herramientas de IA aplicadas a negocios reales. Sin spam.</p>
+    <form id="nl-form" novalidate>
+      <input type="email" name="email" required placeholder="tu@email.com" autocomplete="email">
+      <button type="submit" id="nl-submit">→ Suscribirme</button>
+      <div class="modal-status" id="nl-status" aria-live="polite"></div>
+    </form>
+  </div>
+</div>
 
 <footer>
   <div class="footer-left">Ciudad de México · 2025 · buildingwitheli.com</div>
@@ -453,15 +501,6 @@ footer {
 </footer>
 
 <script>
-// Clock
-function updateClock() {
-  const tz = 'America/Mexico_City';
-  const now = new Date();
-  document.getElementById('nav-date').textContent = now.toLocaleDateString('es-MX', { weekday:'short', month:'short', day:'numeric', timeZone: tz });
-  document.getElementById('nav-time').textContent = now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', second:'2-digit', timeZone: tz, hour12: false }) + ' CDT';
-}
-updateClock(); setInterval(updateClock, 1000);
-
 // Cursor
 const cur = document.getElementById('cursor');
 const ring = document.getElementById('cursor-ring');
@@ -585,6 +624,68 @@ c3d.addEventListener('touchmove', e => {
 
 c3d.addEventListener('touchend', () => { isDragging = false; });
 c3d.addEventListener('touchcancel', () => { isDragging = false; });
+
+// Newsletter modal
+const nlModal = document.getElementById('nl-modal');
+const nlBackdrop = document.getElementById('nl-backdrop');
+const nlClose = document.getElementById('nl-close');
+const nlForm = document.getElementById('nl-form');
+const nlSubmit = document.getElementById('nl-submit');
+const nlStatus = document.getElementById('nl-status');
+
+function openNlModal() {
+  nlModal.hidden = false;
+  nlStatus.textContent = '';
+  nlStatus.className = 'modal-status';
+  nlSubmit.disabled = false;
+  nlSubmit.textContent = '→ Suscribirme';
+  setTimeout(() => {
+    const input = nlModal.querySelector('input[type="email"]');
+    if (input) input.focus();
+  }, 30);
+}
+function closeNlModal() { nlModal.hidden = true; }
+
+document.querySelectorAll('[data-modal="newsletter"]').forEach(el => {
+  el.addEventListener('click', e => { e.preventDefault(); openNlModal(); });
+});
+nlClose.addEventListener('click', closeNlModal);
+nlBackdrop.addEventListener('click', closeNlModal);
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !nlModal.hidden) closeNlModal(); });
+
+nlForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const email = (new FormData(nlForm).get('email') || '').trim();
+  if (!email || !/.+@.+\..+/.test(email)) {
+    nlStatus.textContent = 'Ingresa un correo válido.';
+    nlStatus.className = 'modal-status error';
+    return;
+  }
+  nlSubmit.disabled = true;
+  nlSubmit.textContent = 'Suscribiendo...';
+  nlStatus.textContent = '';
+  nlStatus.className = 'modal-status';
+  try {
+    const res = await fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, source: 'newsletter-card' }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data.success === false) throw new Error('fail');
+    nlStatus.textContent = '¡Listo! Estás dentro. Primera edición próximamente.';
+    nlStatus.className = 'modal-status success';
+    nlSubmit.textContent = 'Enviado';
+    nlForm.reset();
+    setTimeout(closeNlModal, 4200);
+  } catch (err) {
+    console.error('[nl-subscribe]', err);
+    nlStatus.textContent = 'Algo salió mal. Intenta de nuevo.';
+    nlStatus.className = 'modal-status error';
+    nlSubmit.disabled = false;
+    nlSubmit.textContent = '→ Suscribirme';
+  }
+});
 </script>
 </body>
 </html>

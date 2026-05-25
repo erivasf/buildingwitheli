@@ -82,12 +82,6 @@ nav {
 .nav-logo .back { font-family: var(--mono); font-weight: 400; font-size: 14px; color: var(--ink3); transition: color .15s; }
 .nav-logo:hover .back { color: var(--neon); }
 
-.nav-clock {
-  font-family: var(--mono); font-size: 11px; font-weight: 300;
-  color: var(--ink2); letter-spacing: 0.04em; text-align: center; line-height: 1.5;
-}
-.nav-clock .date { color: var(--ink3); font-size: 10px; }
-
 .nav-links { display: flex; gap: 20px; }
 .nav-links a {
   font-family: var(--mono); font-size: 11px;
@@ -331,7 +325,6 @@ footer {
 /* Mobile */
 @media (max-width: 768px) {
   nav { padding: 1rem 1.25rem; }
-  .nav-clock { display: none; }
   main { padding-left: 1.25rem; padding-right: 1.25rem; }
   .market-hero { padding: 4rem 0 2rem; }
   .market-form { padding: 1.5rem; }
@@ -355,10 +348,6 @@ footer {
 
 <nav>
   <a href="/" class="nav-logo"><span class="back">←</span> Building with Eli</a>
-  <div class="nav-clock">
-    <div class="date" id="nav-date"></div>
-    <div id="nav-time"></div>
-  </div>
   <div class="nav-links">
     <a href="https://instagram.com/buildingwitheli" target="_blank">IG</a>
     <a href="https://tiktok.com/@buildingwitheli" target="_blank">TikTok</a>
@@ -447,15 +436,6 @@ footer {
 </div>
 
 <script>
-// Clock
-function updateClock() {
-  const tz = 'America/Mexico_City';
-  const now = new Date();
-  document.getElementById('nav-date').textContent = now.toLocaleDateString('es-MX', { weekday:'short', month:'short', day:'numeric', timeZone: tz });
-  document.getElementById('nav-time').textContent = now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', second:'2-digit', timeZone: tz, hour12: false }) + ' CDT';
-}
-updateClock(); setInterval(updateClock, 1000);
-
 // Cursor
 const cur = document.getElementById('cursor');
 const ring = document.getElementById('cursor-ring');
