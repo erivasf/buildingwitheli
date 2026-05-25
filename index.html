@@ -134,11 +134,22 @@ h1 .accent { color: var(--neon); }
 }
 .hero-sub strong { color: var(--ink); font-weight: 600; }
 
-.subscribe-label {
-  font-family: var(--mono); font-size: 10px;
-  color: var(--ink3); letter-spacing: 0.1em;
-  text-transform: uppercase; margin-bottom: 8px;
+.subscribe-title {
+  font-family: var(--display);
+  font-size: clamp(24px, 3vw, 30px);
+  font-weight: 800;
+  color: var(--neon);
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin-bottom: 8px;
 }
+.subscribe-title .accent { color: var(--ink); }
+.subscribe-blurb {
+  font-size: 13px; color: var(--ink2); font-weight: 300;
+  line-height: 1.55; max-width: 380px;
+  margin-bottom: 1rem;
+}
+.subscribe-blurb strong { color: var(--ink); font-weight: 600; }
 
 .subscribe-form { display: flex; max-width: 380px; }
 
@@ -170,8 +181,8 @@ h1 .accent { color: var(--neon); }
 /* Hero right */
 .hero-right {
   border-left: 1px solid var(--border); padding-left: 2.5rem;
-  display: flex; flex-direction: column; justify-content: space-between;
-  gap: 1.5rem;
+  display: flex; flex-direction: column; justify-content: center;
+  gap: 2.5rem;
 }
 
 .side-stat { margin-bottom: 0; }
@@ -326,7 +337,7 @@ footer {
   nav { padding: 1rem 0; }
   .nav-inner { padding: 0 1.25rem; }
   .hero { grid-template-columns: 1fr; gap: 2.5rem; padding: 5rem 1.25rem 3rem; }
-  .hero-right { border-left: none; border-top: 1px solid var(--border); padding-left: 0; padding-top: 1.5rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+  .hero-right { border-left: none; border-top: 1px solid var(--border); padding-left: 0; padding-top: 1.5rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
   .side-line { display: none; }
   .carousel-rail {
     padding: 6px 1.25rem;
@@ -410,11 +421,12 @@ footer {
   <section class="hero">
     <div class="hero-left fade-in">
       <div class="hero-tag">Ciudad de México · 2026</div>
-      <h1>Construyendo<br><span class="thin">en público</span><span class="accent">.</span><br><span class="thin">No</span> teoría<span class="accent">.</span> <span class="thin">No</span> cursos<span class="accent">.</span></h1>
+      <h1>Construyendo<br><span class="thin">en vivo</span><span class="accent">.</span><br><span class="thin">No</span> teoría<span class="accent">.</span> <span class="thin">No</span> cursos<span class="accent">.</span></h1>
       <p class="hero-sub">
-        Lo que hago cada semana para construir un negocio de <strong>$1M USD</strong>.
+        Lo que hago cada semana para construir un negocio de <strong>$10M USD en 12 meses</strong>.
       </p>
-      <div class="subscribe-label">Newsletter — semanal, en español</div>
+      <h3 class="subscribe-title">Cada lunes<span class="accent">.</span></h3>
+      <p class="subscribe-blurb">Lo que aprendí construyendo en vivo. Números, decisiones, herramientas que probé esta semana. Sin teoría.</p>
       <div class="subscribe-form">
         <input type="email" placeholder="tu@email.com" id="email-input" />
         <button onclick="handleSubscribe()">Suscribirme →</button>
@@ -424,15 +436,9 @@ footer {
 
     <div class="hero-right fade-in" style="transition-delay:.12s">
       <div class="side-stat">
-        <div class="side-stat-num">1<span class="unit">/52</span></div>
-        <div class="side-stat-label">Semana en curso</div>
-      </div>
-      <div class="side-line"></div>
-      <div class="side-stat">
         <div class="side-stat-num">Gratis</div>
-        <div class="side-stat-label">Todos los recursos</div>
+        <div class="side-stat-label">Todos los materiales</div>
       </div>
-      <div class="side-line"></div>
       <div class="side-stat">
         <div class="side-stat-num">No<span class="unit"> vendo</span></div>
         <div class="side-stat-label">Cursos</div>
@@ -480,14 +486,14 @@ footer {
         <div class="card-cta">Próximamente</div>
       </a>
 
-      <a href="#suscribirme" class="card" data-modal="newsletter">
+      <a href="#" class="card">
         <div class="card-top">
           <div class="card-num">04</div>
-          <span class="status live">En vivo</span>
+          <span class="status soon">Próximamente</span>
         </div>
-        <div class="card-title">Newsletter</div>
-        <div class="card-desc">Semanal en español. Growth y ecommerce aplicado a negocios reales. Sin teoría, sin estrategia de redes. Decisiones y números reales.</div>
-        <div class="card-cta">Suscribirme</div>
+        <div class="card-title">Agentes con tus reglas</div>
+        <div class="card-desc">Agentes de IA acotados a las reglas de tu negocio. WhatsApp para ecommerce, auditoría operativa, cualquier proceso. Stack replicable.</div>
+        <div class="card-cta">Próximamente</div>
       </a>
 
     </div>
