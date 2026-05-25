@@ -45,11 +45,13 @@ function buildUserMessage(input) {
     `Marca: ${input.brand}`,
     `URL: ${input.url}`,
     `Industria: ${input.industry}`,
-    `Competidor 1: ${input.comp1}`,
-    `Competidor 2: ${input.comp2 || '(no especificado)'}`,
-    `Competidor 3: ${input.comp3 || '(no especificado)'}`,
-    `Fecha del reporte: ${new Date().toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' })}`,
+    `Geografía: ${input.geografia}`,
+    `Competidor o referencia 1: ${input.comp1}`,
+    `Competidor o referencia 2: ${input.comp2 || '(no especificado)'}`,
+    `Competidor o referencia 3: ${input.comp3 || '(no especificado)'}`,
+    `Idioma del reporte: ${input.idioma || 'Español'}`,
     `Objetivo de negocio: ${input.objetivo}`,
+    `Fecha de generación: ${new Date().toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' })}`,
   ].join('\n');
 }
 
@@ -187,16 +189,17 @@ export default async function handler(req, res) {
   body = body || {};
 
   const {
-    brand, url, industry,
+    brand, url, industry, geografia,
     comp1, comp2 = '', comp3 = '',
     objetivo = '',
+    idioma = 'Español',
     email, subscribe = true,
   } = body;
 
   if (!objetivo || !String(objetivo).trim()) {
     return res.status(400).json({ success: false, error: 'El objetivo de negocio es requerido para generar el reporte.' });
   }
-  if (!brand || !url || !industry || !comp1 || !email) {
+  if (!brand || !url || !industry || !geografia || !comp1 || !email) {
     return res.status(400).json({ success: false, error: 'Faltan campos requeridos.' });
   }
   if (!/.+@.+\..+/.test(email)) {
@@ -206,7 +209,12 @@ export default async function handler(req, res) {
   // Step 1: Claude
   let reportMd;
   try {
-    reportMd = await callClaude({ brand, url, industry, comp1, comp2, comp3, objetivo: String(objetivo).trim() });
+    reportMd = await callClaude({
+      brand, url, industry, geografia,
+      comp1, comp2, comp3,
+      objetivo: String(objetivo).trim(),
+      idioma,
+    });
   } catch (err) {
     console.error('[step:claude]', err);
     return res.status(500).json({ success: false, error: 'Falló la generación del reporte (Claude).' });
