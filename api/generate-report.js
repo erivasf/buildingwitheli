@@ -15,8 +15,7 @@ const BEEHIIV_TAG = 'market-researcher';
 let cachedSystemPrompt = null;
 function loadSystemPrompt() {
   if (cachedSystemPrompt) return cachedSystemPrompt;
-  const path = join(process.cwd(), 'system-prompt.txt');
-  cachedSystemPrompt = readFileSync(path, 'utf8');
+  cachedSystemPrompt = readFileSync(join(process.cwd(), 'system-prompt.txt'), 'utf8');
   return cachedSystemPrompt;
 }
 
@@ -26,23 +25,38 @@ function requireEnv(name) {
   return v;
 }
 
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[c]));
+}
+
+function slug(s) {
+  return String(s)
+    .toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 40) || 'market';
+}
+
 function buildUserMessage(input) {
-  const competitors = [input.comp1, input.comp2, input.comp3].filter(Boolean);
   return [
     `Marca: ${input.brand}`,
     `URL: ${input.url}`,
     `Industria: ${input.industry}`,
-    `Competidores: ${competitors.join(', ')}`,
-    `Frecuencia: ${input.frequency || 'weekly'}`,
+    `Competidor 1: ${input.comp1}`,
+    `Competidor 2: ${input.comp2 || '(no especificado)'}`,
+    `Competidor 3: ${input.comp3 || '(no especificado)'}`,
     `Fecha del reporte: ${new Date().toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' })}`,
   ].join('\n');
 }
 
-async function generateReportMarkdown(input) {
+async function callClaude(input) {
   const anthropic = new Anthropic({ apiKey: requireEnv('ANTHROPIC_API_KEY') });
   const msg = await anthropic.messages.create({
     model: CLAUDE_MODEL,
-    max_tokens: 4096,
+    max_tokens: 4000,
     system: loadSystemPrompt(),
     messages: [{ role: 'user', content: buildUserMessage(input) }],
   });
@@ -64,47 +78,43 @@ function wrapHtml(markdownHtml, brand) {
   @page { size: A4; margin: 22mm 18mm; }
   * { box-sizing: border-box; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    color: #1a1a1a; font-size: 11pt; line-height: 1.55;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #ffffff; color: #0f0f0f;
+    font-size: 10.5pt; line-height: 1.6;
     margin: 0; padding: 0;
   }
+  .container { max-width: 720px; margin: 0 auto; }
   .header {
-    border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 24px;
+    border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 24px;
     display: flex; justify-content: space-between; align-items: baseline;
-    font-size: 9pt; color: #888; letter-spacing: 0.04em;
+    font-size: 9pt; color: #999; letter-spacing: 0.04em;
   }
-  .brand { font-weight: 600; color: #1a1a1a; }
+  .brand { font-weight: 600; color: #0f0f0f; }
   .accent { color: #ff4d00; }
-  h1 { font-size: 22pt; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 4px; line-height: 1.1; }
-  h2 { font-size: 13pt; font-weight: 700; letter-spacing: -0.01em; margin: 22px 0 8px; padding-bottom: 4px; border-bottom: 1px solid #eee; }
-  h3 { font-size: 11pt; font-weight: 700; margin: 14px 0 4px; }
+  h1 { color: #ff4d00; font-size: 20pt; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; margin: 0 0 6px; }
+  h2 { color: #0f0f0f; font-size: 14pt; font-weight: 700; letter-spacing: -0.01em; border-bottom: 2px solid #ff4d00; padding-bottom: 6px; margin: 22px 0 8px; }
+  h3 { color: #0f0f0f; font-size: 12pt; font-weight: 600; margin: 14px 0 4px; }
   p { margin: 0 0 8px; }
   ul, ol { margin: 0 0 10px 18px; padding: 0; }
   li { margin-bottom: 4px; }
-  em { color: #888; font-style: normal; font-size: 9.5pt; letter-spacing: 0.02em; }
-  strong { color: #1a1a1a; }
+  strong { color: #0f0f0f; }
+  em { color: #555; font-style: italic; }
+  blockquote { color: #ff4d00; border-left: 2px solid #ff4d00; padding-left: 12px; margin: 10px 0; font-style: normal; }
   hr { border: none; border-top: 1px solid #eee; margin: 18px 0; }
-  .footer {
-    margin-top: 36px; padding-top: 12px; border-top: 1px solid #ddd;
-    font-size: 8.5pt; color: #999; text-align: center; letter-spacing: 0.04em;
-  }
+  .footer { margin-top: 36px; padding-top: 12px; border-top: 1px solid #eee; font-size: 10pt; color: #999; text-align: center; letter-spacing: 0.04em; }
 </style>
 </head>
 <body>
-  <div class="header">
-    <span class="brand">Building with Eli<span class="accent">.</span></span>
-    <span>Market Researcher</span>
+  <div class="container">
+    <div class="header">
+      <span class="brand">Building with Eli<span class="accent">.</span></span>
+      <span>Market Researcher</span>
+    </div>
+    ${markdownHtml}
+    <div class="footer">Generado por buildingwitheli.com · @buildingwitheli</div>
   </div>
-  ${markdownHtml}
-  <div class="footer">Generado por buildingwitheli.com · @buildingwitheli</div>
 </body>
 </html>`;
-}
-
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, (c) => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-  }[c]));
 }
 
 async function renderPdf(html) {
@@ -117,12 +127,7 @@ async function renderPdf(html) {
   try {
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'networkidle0' });
-    const pdf = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      preferCSSPageSize: true,
-    });
-    return pdf;
+    return await page.pdf({ format: 'A4', printBackground: true, preferCSSPageSize: true });
   } finally {
     await browser.close();
   }
@@ -133,34 +138,17 @@ async function sendEmail({ to, brand, pdfBuffer }) {
   return resend.emails.send({
     from: `Building with Eli <${FROM_EMAIL}>`,
     to,
-    subject: `Tu reporte de mercado: ${brand}`,
-    text:
-`Listo. Adjunto va tu reporte de mercado.
-
-Lee el resumen ejecutivo primero, luego las acciones para esta semana. Esa es la parte que mueve la aguja.
-
-Si quieres uno nuevo, regresa a buildingwitheli.com/market y vuelve a llenar el formulario.
-
-Eli`,
-    attachments: [
-      {
-        filename: `reporte-${slug(brand)}.pdf`,
-        content: pdfBuffer,
-      },
-    ],
+    subject: `Tu reporte de inteligencia de mercado: ${brand}`,
+    html: `<p>Hola, aquí está tu reporte de inteligencia de mercado para <strong>${escapeHtml(brand)}</strong>. Generado con el sistema que uso para mis propias startups.</p>
+<p>Elías</p>`,
+    attachments: [{
+      filename: `market-intelligence-${slug(brand)}.pdf`,
+      content: pdfBuffer,
+    }],
   });
 }
 
-function slug(s) {
-  return String(s)
-    .toLowerCase()
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 40) || 'market';
-}
-
-async function subscribeToBeehiiv({ email, brand }) {
+async function subscribeToBeehiiv({ email }) {
   const apiKey = requireEnv('BEEHIIV_API_KEY');
   const pubId = requireEnv('BEEHIIV_PUBLICATION_ID');
   const res = await fetch(
@@ -177,12 +165,7 @@ async function subscribeToBeehiiv({ email, brand }) {
         send_welcome_email: false,
         utm_source: BEEHIIV_TAG,
         utm_medium: 'tool',
-        utm_campaign: BEEHIIV_TAG,
-        referring_site: 'buildingwitheli.com/market',
-        custom_fields: [
-          { name: 'tool', value: BEEHIIV_TAG },
-          { name: 'brand', value: brand },
-        ],
+        custom_fields: [{ name: 'source_tool', value: BEEHIIV_TAG }],
       }),
     }
   );
@@ -190,57 +173,62 @@ async function subscribeToBeehiiv({ email, brand }) {
     const body = await res.text().catch(() => '');
     throw new Error(`Beehiiv ${res.status}: ${body.slice(0, 200)}`);
   }
-  return res.json().catch(() => ({}));
 }
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
-    return res.status(405).json({ error: 'Método no permitido.' });
+    return res.status(405).json({ success: false, error: 'Método no permitido.' });
   }
 
   let body = req.body;
-  if (typeof body === 'string') {
-    try { body = JSON.parse(body); } catch { body = {}; }
-  }
+  if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
   body = body || {};
 
-  const {
-    brand, url, industry,
-    comp1, comp2 = '', comp3 = '',
-    frequency = 'weekly',
-    email, subscribe = true,
-  } = body;
+  const { brand, url, industry, comp1, comp2 = '', comp3 = '', email, subscribe = true } = body;
 
   if (!brand || !url || !industry || !comp1 || !email) {
-    return res.status(400).json({ error: 'Faltan campos requeridos.' });
+    return res.status(400).json({ success: false, error: 'Faltan campos requeridos.' });
   }
   if (!/.+@.+\..+/.test(email)) {
-    return res.status(400).json({ error: 'Correo inválido.' });
+    return res.status(400).json({ success: false, error: 'Correo inválido.' });
   }
 
+  // Step 1: Claude
+  let reportMd;
   try {
-    const reportMd = await generateReportMarkdown({
-      brand, url, industry, comp1, comp2, comp3, frequency,
-    });
-    const html = wrapHtml(marked.parse(reportMd), brand);
-    const pdfBuffer = await renderPdf(html);
-
-    await sendEmail({ to: email, brand, pdfBuffer });
-
-    if (subscribe) {
-      try {
-        await subscribeToBeehiiv({ email, brand });
-      } catch (err) {
-        console.error('[beehiiv]', err.message);
-      }
-    }
-
-    return res.status(200).json({ success: true });
+    reportMd = await callClaude({ brand, url, industry, comp1, comp2, comp3 });
   } catch (err) {
-    console.error('[generate-report]', err);
-    return res.status(500).json({
-      error: 'No pudimos generar tu reporte. Intenta de nuevo en un momento.',
-    });
+    console.error('[step:claude]', err);
+    return res.status(500).json({ success: false, error: 'Falló la generación del reporte (Claude).' });
   }
+
+  // Step 2: Markdown → PDF
+  let pdfBuffer;
+  try {
+    const html = wrapHtml(marked.parse(reportMd), brand);
+    pdfBuffer = await renderPdf(html);
+  } catch (err) {
+    console.error('[step:pdf]', err);
+    return res.status(500).json({ success: false, error: 'Falló la generación del PDF.' });
+  }
+
+  // Step 3: Resend
+  try {
+    await sendEmail({ to: email, brand, pdfBuffer });
+  } catch (err) {
+    console.error('[step:resend]', err);
+    return res.status(500).json({ success: false, error: 'No pudimos enviar el correo.' });
+  }
+
+  // Step 4: Beehiiv (no rompe el flujo si falla)
+  if (subscribe) {
+    try {
+      await subscribeToBeehiiv({ email });
+    } catch (err) {
+      console.error('[step:beehiiv]', err);
+    }
+  }
+
+  return res.status(200).json({ success: true });
 }

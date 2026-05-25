@@ -322,7 +322,7 @@ footer {
   text-align: center; min-height: 14px;
 }
 .modal-status.error { color: #c0392b; }
-.modal-status.success { color: var(--neon); }
+.modal-status.success { color: #1a7a4a; }
 
 /* Fade-in */
 .fade-in { opacity: 0; transform: translateY(12px); transition: opacity .5s ease, transform .5s ease; }
@@ -404,15 +404,8 @@ footer {
         <label for="comp3">Competidor 3</label>
         <input type="text" id="comp3" name="comp3" placeholder="Nombre o URL (opcional)">
       </div>
-      <div class="field">
-        <label for="frequency">Frecuencia</label>
-        <select id="frequency" name="frequency">
-          <option value="weekly">Semanal</option>
-          <option value="monthly">Mensual</option>
-        </select>
-      </div>
       <button type="submit" class="market-cta">→ Generar mi reporte</button>
-      <p class="market-note">Gratis. Sin registro. Sin spam.</p>
+      <p class="market-note">Gratis. Sin spam.</p>
     </form>
   </section>
 
@@ -420,8 +413,8 @@ footer {
     <div class="section-label">Cómo usarlo</div>
     <ol>
       <li><span>01</span> Llena los datos de tu negocio y competidores.</li>
-      <li><span>02</span> Elige frecuencia: semanal o mensual.</li>
-      <li><span>03</span> Descarga tu reporte en PDF.</li>
+      <li><span>02</span> Te llega el reporte en PDF a tu correo.</li>
+      <li><span>03</span> Súbelo a tu LLM favorito para actualizarlo cuando quieras.</li>
     </ol>
   </section>
 </main>
@@ -514,7 +507,6 @@ marketForm.addEventListener('submit', e => {
     comp1,
     comp2: (fd.get('comp2') || '').trim(),
     comp3: (fd.get('comp3') || '').trim(),
-    frequency: fd.get('frequency') || 'weekly',
   };
   openModal();
 });
@@ -565,15 +557,16 @@ emailForm.addEventListener('submit', async e => {
       body: JSON.stringify({ ...pendingPayload, email, subscribe }),
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.error || 'Algo falló. Intenta de nuevo.');
+    if (!res.ok || data.success === false) throw new Error(data.error || 'fail');
 
-    modalStatus.textContent = data.message || 'Listo. Te enviamos el reporte a tu correo.';
+    modalStatus.textContent = '¡Listo! Revisa tu correo en los próximos minutos.';
     modalStatus.className = 'modal-status success';
     emailSubmit.textContent = 'Enviado';
     emailForm.reset();
-    setTimeout(closeModal, 3800);
+    setTimeout(closeModal, 4200);
   } catch (err) {
-    modalStatus.textContent = err.message || 'Error. Intenta de nuevo.';
+    console.error('[generate-report]', err);
+    modalStatus.textContent = 'Algo salió mal. Intenta de nuevo.';
     modalStatus.className = 'modal-status error';
     emailSubmit.disabled = false;
     emailSubmit.textContent = '→ Enviar reporte';
