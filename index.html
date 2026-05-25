@@ -192,8 +192,8 @@ h1 .accent { color: var(--neon); }
 /* Section divider */
 .section-divider { max-width: 1100px; margin: 0 auto; padding: 0 2.5rem; border-top: 1px solid var(--border2); }
 
-/* ── 3D CAROUSEL ── */
-.carousel-section { padding: 4.5rem 0 6rem; overflow: hidden; }
+/* ── CAROUSEL ── */
+.carousel-section { padding: 4.5rem 0 6rem; }
 
 .carousel-header {
   max-width: 1100px; margin: 0 auto;
@@ -205,26 +205,25 @@ h1 .accent { color: var(--neon); }
   letter-spacing: 0.12em; color: var(--ink3); text-transform: uppercase;
 }
 
-.carousel-3d-wrap {
-  perspective: 1000px;
-  height: 320px;
-  display: flex; align-items: center; justify-content: center;
-  position: relative;
+.carousel-rail {
+  display: flex; gap: 1.25rem;
+  overflow-x: auto; overflow-y: visible;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding: 6px max(2.5rem, calc((100vw - 1100px) / 2 + 2.5rem));
+  scroll-padding-left: max(2.5rem, calc((100vw - 1100px) / 2 + 2.5rem));
+  scrollbar-width: none; -ms-overflow-style: none;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 4rem, #000 calc(100% - 4rem), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 4rem, #000 calc(100% - 4rem), transparent 100%);
 }
+.carousel-rail::-webkit-scrollbar { display: none; }
 
-.carousel-3d {
-  position: relative;
-  width: 260px; height: 260px;
-  transform-style: preserve-3d;
-  will-change: transform;
-  touch-action: pan-y;
-}
-
-.card-3d {
-  position: absolute;
-  width: 240px; height: 240px;
-  left: 50%; top: 50%;
-  margin-left: -120px; margin-top: -120px;
+.card {
+  flex: 0 0 auto;
+  width: clamp(280px, 30vw, 340px);
+  aspect-ratio: 5 / 4;
+  scroll-snap-align: start;
   background: var(--glass);
   backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255,255,255,0.6);
@@ -232,25 +231,19 @@ h1 .accent { color: var(--neon); }
   padding: 1.5rem;
   display: flex; flex-direction: column;
   text-decoration: none;
-  transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
+  transition: background .25s ease, border-color .25s ease, box-shadow .25s ease, transform .25s ease;
   overflow: hidden;
 }
-
-.card-3d:hover {
+.card:hover {
   background: rgba(255,255,255,0.65);
   border-color: var(--neon);
   box-shadow: 0 0 14px var(--neon-glow);
+  transform: translateY(-2px);
 }
 
-/* Position each card around the circle */
-.card-3d:nth-child(1) { transform: rotateY(0deg)   translateZ(320px); }
-.card-3d:nth-child(2) { transform: rotateY(90deg)  translateZ(320px); }
-.card-3d:nth-child(3) { transform: rotateY(180deg) translateZ(320px); }
-.card-3d:nth-child(4) { transform: rotateY(270deg) translateZ(320px); }
+.card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1rem; }
 
-.card-top-3d { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1rem; }
-
-.card-num-3d {
+.card-num {
   font-family: var(--mono); font-size: 10px; color: var(--ink3);
   letter-spacing: 0.1em;
 }
@@ -268,31 +261,45 @@ h1 .accent { color: var(--neon); }
 .status.soon { color: var(--soon); background: var(--soon-bg); border: 1px solid rgba(0,0,0,0.08); }
 .status.soon::before { background: var(--soon); }
 
-.card-title-3d {
+.card-title {
   font-family: var(--display);
-  font-size: 17px; font-weight: 700;
-  color: var(--ink); line-height: 1.15; margin-bottom: 7px;
+  font-size: 18px; font-weight: 700;
+  color: var(--ink); line-height: 1.15; margin-bottom: 8px;
   letter-spacing: -0.02em;
 }
 
-.card-desc-3d {
-  font-size: 11px; font-weight: 300; color: var(--ink2);
+.card-desc {
+  font-size: 12px; font-weight: 300; color: var(--ink2);
   line-height: 1.6; flex: 1;
 }
 
-.card-cta-3d {
+.card-cta {
   margin-top: 1rem; font-family: var(--mono); font-size: 10px;
   color: var(--ink3); letter-spacing: 0.07em;
   display: flex; align-items: center; gap: 5px;
 }
-.card-3d:hover .card-cta-3d { color: var(--neon); }
-.card-cta-3d::after { content: '→'; }
+.card:hover .card-cta { color: var(--neon); }
+.card-cta::after { content: '→'; }
 
-/* Carousel hint */
-.carousel-hint {
-  text-align: center; margin-top: 1.5rem;
-  font-family: var(--mono); font-size: 10px;
-  color: var(--ink3); letter-spacing: 0.08em;
+/* Dots indicator */
+.carousel-dots {
+  display: flex; justify-content: center; gap: 6px;
+  margin-top: 2rem;
+}
+.dot {
+  width: 6px; height: 6px;
+  background: var(--ink3);
+  border-radius: 50%;
+  opacity: 0.4;
+  transition: opacity .25s ease, width .25s ease, background .25s ease;
+  cursor: none;
+  border: none; padding: 0;
+}
+.dot.active {
+  opacity: 1;
+  background: var(--neon);
+  width: 18px;
+  border-radius: 4px;
 }
 
 /* Footer */
@@ -321,11 +328,13 @@ footer {
   .hero { grid-template-columns: 1fr; gap: 2.5rem; padding: 5rem 1.25rem 3rem; }
   .hero-right { border-left: none; border-top: 1px solid var(--border); padding-left: 0; padding-top: 1.5rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
   .side-line { display: none; }
-  .card-3d { width: 200px; height: 200px; margin-left: -100px; margin-top: -100px; }
-  .card-3d:nth-child(1) { transform: rotateY(0deg)   translateZ(240px); }
-  .card-3d:nth-child(2) { transform: rotateY(90deg)  translateZ(240px); }
-  .card-3d:nth-child(3) { transform: rotateY(180deg) translateZ(240px); }
-  .card-3d:nth-child(4) { transform: rotateY(270deg) translateZ(240px); }
+  .carousel-rail {
+    padding: 6px 1.25rem;
+    scroll-padding-left: 1.25rem;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 1.25rem, #000 calc(100% - 1.25rem), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 1.25rem, #000 calc(100% - 1.25rem), transparent 100%);
+  }
+  .card { width: 78vw; }
   footer { padding: 1.25rem 0; }
   .footer-inner { padding: 0 1.25rem; flex-direction: column; gap: 8px; text-align: center; }
 }
@@ -377,7 +386,7 @@ footer {
 @media (hover: none) and (pointer: coarse) {
   html { cursor: auto; }
   .cursor, .cursor-ring { display: none !important; }
-  .subscribe-form button, .modal-close, #nl-form button { cursor: pointer; }
+  .subscribe-form button, .modal-close, #nl-form button, .dot { cursor: pointer; }
   #nl-form input { cursor: text; }
 }
 </style>
@@ -433,56 +442,61 @@ footer {
 
   <div class="section-divider"></div>
 
-  <!-- 3D CAROUSEL -->
+  <!-- CAROUSEL -->
   <section class="carousel-section fade-in" style="transition-delay:.18s">
     <div class="carousel-header">
       <div class="section-label">Recursos y herramientas</div>
     </div>
 
-    <div class="carousel-3d-wrap">
-      <div class="carousel-3d" id="carousel3d">
+    <div class="carousel-rail" id="carousel-rail">
 
-        <a href="/market" class="card-3d">
-          <div class="card-top-3d">
-            <div class="card-num-3d">01</div>
-            <span class="status live">En vivo</span>
-          </div>
-          <div class="card-title-3d">Market Intelligence</div>
-          <div class="card-desc-3d">Reporte completo de tu mercado en 30 segundos. Competidores, oportunidades, alertas semanales. Gratis, sin registro.</div>
-          <div class="card-cta-3d">Usar herramienta</div>
-        </a>
+      <a href="/market" class="card">
+        <div class="card-top">
+          <div class="card-num">01</div>
+          <span class="status live">En vivo</span>
+        </div>
+        <div class="card-title">Market Intelligence</div>
+        <div class="card-desc">Reporte completo de tu mercado en 30 segundos. Competidores, oportunidades, alertas semanales.</div>
+        <div class="card-cta">Usar herramienta</div>
+      </a>
 
-        <a href="#" class="card-3d">
-          <div class="card-top-3d">
-            <div class="card-num-3d">02</div>
-            <span class="status soon">Próximamente</span>
-          </div>
-          <div class="card-title-3d">Template de Entrevistas</div>
-          <div class="card-desc-3d">Framework basado en The Mom Test, Jobs To Be Done y los 5 Por Qués de Toyota. Entrevistas que generan insights reales.</div>
-          <div class="card-cta-3d">Próximamente</div>
-        </a>
+      <a href="#" class="card">
+        <div class="card-top">
+          <div class="card-num">02</div>
+          <span class="status soon">Próximamente</span>
+        </div>
+        <div class="card-title">Template de Entrevistas</div>
+        <div class="card-desc">Framework basado en The Mom Test, Jobs To Be Done y los 5 Por Qués de Toyota. Entrevistas que generan insights reales.</div>
+        <div class="card-cta">Próximamente</div>
+      </a>
 
-        <a href="#" class="card-3d">
-          <div class="card-top-3d">
-            <div class="card-num-3d">03</div>
-            <span class="status soon">Próximamente</span>
-          </div>
-          <div class="card-title-3d">LP en Minutos</div>
-          <div class="card-desc-3d">Lanza una landing page con Claude Code + Vercel + dominio en Cloudflare. De cero a live en menos de una hora.</div>
-          <div class="card-cta-3d">Próximamente</div>
-        </a>
+      <a href="#" class="card">
+        <div class="card-top">
+          <div class="card-num">03</div>
+          <span class="status soon">Próximamente</span>
+        </div>
+        <div class="card-title">LP en Minutos</div>
+        <div class="card-desc">Lanza una landing page con Claude Code + Vercel + dominio en Cloudflare. De cero a live en menos de una hora.</div>
+        <div class="card-cta">Próximamente</div>
+      </a>
 
-        <a href="#suscribirme" class="card-3d" data-modal="newsletter">
-          <div class="card-top-3d">
-            <div class="card-num-3d">04</div>
-            <span class="status live">En vivo</span>
-          </div>
-          <div class="card-title-3d">Newsletter</div>
-          <div class="card-desc-3d">Semanal en español. Growth y ecommerce aplicado a negocios reales. Sin teoría, sin estrategia de redes. Decisiones y números reales.</div>
-          <div class="card-cta-3d">Suscribirme</div>
-        </a>
+      <a href="#suscribirme" class="card" data-modal="newsletter">
+        <div class="card-top">
+          <div class="card-num">04</div>
+          <span class="status live">En vivo</span>
+        </div>
+        <div class="card-title">Newsletter</div>
+        <div class="card-desc">Semanal en español. Growth y ecommerce aplicado a negocios reales. Sin teoría, sin estrategia de redes. Decisiones y números reales.</div>
+        <div class="card-cta">Suscribirme</div>
+      </a>
 
-      </div>
+    </div>
+
+    <div class="carousel-dots" id="carousel-dots">
+      <button class="dot active" type="button" data-idx="0" aria-label="Card 1"></button>
+      <button class="dot" type="button" data-idx="1" aria-label="Card 2"></button>
+      <button class="dot" type="button" data-idx="2" aria-label="Card 3"></button>
+      <button class="dot" type="button" data-idx="3" aria-label="Card 4"></button>
     </div>
 
   </section>
@@ -544,99 +558,40 @@ function handleSubscribe() {
   input.value = ''; input.disabled = true;
 }
 
-// 3D carousel — rAF spin, drag, momentum
-const c3d = document.getElementById('carousel3d');
-const wrap = document.querySelector('.carousel-3d-wrap');
+// Carousel — scroll-snap with dot indicator
+const carouselRail = document.getElementById('carousel-rail');
+const carouselCards = Array.from(carouselRail.querySelectorAll('.card'));
+const carouselDots = Array.from(document.querySelectorAll('#carousel-dots .dot'));
 
-let currentAngle = 0;
-let velocity = 0;          // deg/ms — momentum after a release
-let isDragging = false;
-let autoPaused = false;    // desktop hover pauses auto-spin
-let dragStartAngle = 0;
-let mouseStartX = 0;
-let touchStartX = 0, touchStartY = 0;
-let touchDecided = false;
-let lastMoveX = 0, lastMoveTime = 0;
-const AUTO_SPEED = -360 / 18000; // deg/ms — same cadence as before
-
-let lastFrame = 0;
-function spinFrame(t) {
-  if (!lastFrame) lastFrame = t;
-  const dt = Math.min(t - lastFrame, 50);
-  lastFrame = t;
-
-  if (!isDragging) {
-    if (Math.abs(velocity) > 0.002) {
-      currentAngle += velocity * dt;
-      velocity *= Math.pow(0.94, dt / 16);
-    } else {
-      velocity = 0;
-      if (!autoPaused) currentAngle += AUTO_SPEED * dt;
-    }
-  }
-
-  c3d.style.transform = `rotateY(${currentAngle}deg)`;
-  requestAnimationFrame(spinFrame);
+function updateCarouselDots() {
+  const railRect = carouselRail.getBoundingClientRect();
+  const pad = parseFloat(getComputedStyle(carouselRail).paddingLeft) || 0;
+  const targetLeft = railRect.left + pad;
+  let closestIdx = 0;
+  let closestDist = Infinity;
+  carouselCards.forEach((card, i) => {
+    const dist = Math.abs(card.getBoundingClientRect().left - targetLeft);
+    if (dist < closestDist) { closestDist = dist; closestIdx = i; }
+  });
+  carouselDots.forEach((d, i) => d.classList.toggle('active', i === closestIdx));
 }
-requestAnimationFrame(spinFrame);
 
-wrap.addEventListener('mouseenter', () => { autoPaused = true; });
-wrap.addEventListener('mouseleave', () => { autoPaused = false; });
-
-c3d.addEventListener('mousedown', e => {
-  isDragging = true;
-  mouseStartX = e.clientX;
-  dragStartAngle = currentAngle;
-  velocity = 0;
-  e.preventDefault();
-});
-document.addEventListener('mousemove', e => {
-  if (!isDragging) return;
-  const dx = e.clientX - mouseStartX;
-  currentAngle = dragStartAngle - dx * 0.4;
-});
-document.addEventListener('mouseup', () => {
-  if (!isDragging) return;
-  isDragging = false;
-});
-
-c3d.addEventListener('touchstart', e => {
-  const t = e.touches[0];
-  touchStartX = t.clientX;
-  touchStartY = t.clientY;
-  touchDecided = false;
-  isDragging = true;
-  dragStartAngle = currentAngle;
-  velocity = 0;
-  lastMoveX = touchStartX;
-  lastMoveTime = performance.now();
+let scrollRaf = 0;
+carouselRail.addEventListener('scroll', () => {
+  cancelAnimationFrame(scrollRaf);
+  scrollRaf = requestAnimationFrame(updateCarouselDots);
 }, { passive: true });
+window.addEventListener('resize', () => {
+  cancelAnimationFrame(scrollRaf);
+  scrollRaf = requestAnimationFrame(updateCarouselDots);
+});
+updateCarouselDots();
 
-c3d.addEventListener('touchmove', e => {
-  if (!isDragging) return;
-  const t = e.touches[0];
-  const dx = t.clientX - touchStartX;
-  const dy = t.clientY - touchStartY;
-
-  if (!touchDecided) {
-    if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
-    if (Math.abs(dy) > Math.abs(dx)) { isDragging = false; return; }
-    touchDecided = true;
-  }
-
-  if (e.cancelable) e.preventDefault();
-
-  currentAngle = dragStartAngle + dx * 0.5;
-
-  const now = performance.now();
-  const ddt = now - lastMoveTime;
-  if (ddt > 0) velocity = ((t.clientX - lastMoveX) * 0.5) / ddt;
-  lastMoveX = t.clientX;
-  lastMoveTime = now;
-}, { passive: false });
-
-c3d.addEventListener('touchend', () => { isDragging = false; });
-c3d.addEventListener('touchcancel', () => { isDragging = false; });
+carouselDots.forEach((dot, i) => {
+  dot.addEventListener('click', () => {
+    carouselCards[i].scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+  });
+});
 
 // Newsletter modal
 const nlModal = document.getElementById('nl-modal');
