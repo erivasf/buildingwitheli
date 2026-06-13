@@ -11,6 +11,47 @@ export const config = { maxDuration: 60 };
 const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 const FROM_EMAIL = 'reporte@buildingwitheli.com';
 const BEEHIIV_TAG = 'market-researcher';
+const PROMPT_URL = 'https://github.com/erivasf/buildingwitheli/blob/main/system-prompt.txt';
+
+const RECURRING_APPENDIX_MD = `
+
+---
+
+## Vuélvelo semanal
+
+Un reporte aislado es útil. Una serie es una ventaja estructural. Tres formas de automatizar este flujo según tu nivel:
+
+### Opción 1 · Claude Project (5 min, recomendado)
+
+Para quien ya tiene Claude Pro. Setup una vez, abres el proyecto cada lunes.
+
+1. claude.ai → Projects → Create new project
+2. Nómbralo "Market Intel · [tu marca]"
+3. En **Project Instructions**, pega el prompt de [system-prompt.txt](${PROMPT_URL})
+4. En **Knowledge**, sube un doc con tus inputs (marca, URL, industria, geografía, competidores, objetivo)
+5. Cada lunes: abres el proyecto, escribes "Genera el reporte de esta semana"
+
+### Opción 2 · Notion + Claude (historial apilado)
+
+Para quien vive en Notion. No es automático, pero los reportes quedan uno debajo del otro como repo de conocimiento.
+
+1. Crea una página "Market Intel · [tu marca]"
+2. Arriba pones una sección "Inputs" con tus datos
+3. Conecta Claude en Notion (Settings → Integrations → Claude)
+4. Cada lunes copias el prompt + tus inputs y le preguntas a Claude desde la página
+
+A las pocas semanas tienes el historial completo de tu mercado en un solo lugar.
+
+### Opción 3 · Workflow automático (set and forget)
+
+Para quien ya tiene workflows en n8n, Make, o Zapier. Corre solo cada lunes y te llega al correo.
+
+1. Trigger: cron semanal lunes 7am
+2. Inputs guardados en Airtable o Notion DB
+3. HTTP request a la API de Anthropic con el prompt + inputs
+4. Convertir markdown a PDF
+5. Mandar por Gmail o Resend
+`;
 
 let cachedSystemPrompt = null;
 function loadSystemPrompt() {
@@ -138,12 +179,36 @@ async function renderPdf(html) {
 
 async function sendEmail({ to, brand, pdfBuffer }) {
   const resend = new Resend(requireEnv('RESEND_API_KEY'));
+  const b = escapeHtml(brand);
   return resend.emails.send({
     from: `Building with Eli <${FROM_EMAIL}>`,
     to,
-    subject: `Tu reporte de inteligencia de mercado: ${brand}`,
-    html: `<p>Hola, aquí está tu reporte de inteligencia de mercado para <strong>${escapeHtml(brand)}</strong>. Generado con el sistema que uso para mis propias startups.</p>
-<p>Elías</p>`,
+    subject: `Tu reporte de mercado · ${brand}`,
+    text:
+`Hola,
+
+Aquí va tu reporte para ${brand}.
+
+Empieza por el TL;DR. Si te resuena, baja a la sección de Acciones. Son 5 decisiones concretas para esta semana.
+
+El valor de un reporte así no está en uno. Está en la serie. Múltiples reportes consecutivos te dan patrones, decisiones validadas y oportunidades que un reporte aislado no muestra.
+
+En la última página te dejé las 3 formas más fáciles de automatizarlo. La más rápida toma 5 minutos.
+
+Cualquier cosa no dudes en escribirme a este correo.
+
+Un abrazo,
+Elías
+buildingwitheli.com`,
+    html: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #0f0f0f; max-width: 560px;">
+<p>Hola,</p>
+<p>Aquí va tu reporte para <strong>${b}</strong>.</p>
+<p>Empieza por el TL;DR. Si te resuena, baja a la sección de Acciones. Son 5 decisiones concretas para esta semana.</p>
+<p>El valor de un reporte así no está en uno. Está en la serie. Múltiples reportes consecutivos te dan patrones, decisiones validadas y oportunidades que un reporte aislado no muestra.</p>
+<p>En la última página te dejé las 3 formas más fáciles de automatizarlo. La más rápida toma 5 minutos.</p>
+<p>Cualquier cosa no dudes en escribirme a este correo.</p>
+<p>Un abrazo,<br>Elías<br><a href="https://buildingwitheli.com" style="color:#ff4d00;text-decoration:none;">buildingwitheli.com</a></p>
+</div>`,
     attachments: [{
       filename: `market-intelligence-${slug(brand)}.pdf`,
       content: pdfBuffer,
@@ -220,10 +285,11 @@ export default async function handler(req, res) {
     return res.status(500).json({ success: false, error: 'Falló la generación del reporte (Claude).' });
   }
 
-  // Step 2: Markdown → PDF
+  // Step 2: Markdown → PDF (con appendix estático "Vuélvelo semanal")
   let pdfBuffer;
   try {
-    const html = wrapHtml(marked.parse(reportMd), brand);
+    const fullMd = reportMd + RECURRING_APPENDIX_MD;
+    const html = wrapHtml(marked.parse(fullMd), brand);
     pdfBuffer = await renderPdf(html);
   } catch (err) {
     console.error('[step:pdf]', err);

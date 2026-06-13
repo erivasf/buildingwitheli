@@ -148,16 +148,31 @@ Queries: "[categoría] [país] lanzamiento digital [año]",
 
 ---
 
-### TOP 3 FLAGS
+### TL;DR DE LA SEMANA
 
-Los tres hallazgos de mayor señal, filtrados por
-relevancia al objetivo declarado. Una oración cada uno.
-Empieza con la implicación estratégica para la marca,
-no con el dato crudo.
+Los cinco hallazgos de mayor señal, filtrados por
+relevancia al objetivo declarado. Estilo Axios: una
+oración de implicación estratégica, una oración del
+hecho que la soporta. Ordenados por impacto descendente.
+El primer bullet debe ser lo que tú harías primero si
+fueras el founder.
 
-1. [Implicación estratégica] — [hecho de soporte]
-2. [Implicación estratégica] — [hecho de soporte]
-3. [Implicación estratégica] — [hecho de soporte]
+1. [Implicación estratégica]. [Hecho de soporte].
+2. [Implicación estratégica]. [Hecho de soporte].
+3. [Implicación estratégica]. [Hecho de soporte].
+4. [Implicación estratégica]. [Hecho de soporte].
+5. [Implicación estratégica]. [Hecho de soporte].
+
+---
+
+**Apertura por sección** (aplica a 01–05):
+Cada una de las cinco secciones temáticas que siguen abre con
+una sola línea en cursiva, en voz pragmática, que resume lo
+importante de esa sección esta semana. Una línea por sección,
+ni una más. Ejemplos válidos:
+*Lo importante esta semana:*
+*Lo que cambió desde el último reporte:*
+*Donde está la apertura:*
 
 ---
 
