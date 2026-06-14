@@ -3,10 +3,11 @@ import { Resend } from 'resend';
 import { marked } from 'marked';
 import puppeteer from 'puppeteer-core';
 import chromium from '@sparticuz/chromium';
+import { waitUntil } from '@vercel/functions';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-export const config = { maxDuration: 60 };
+export const config = { maxDuration: 300 };
 
 const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 const FROM_EMAIL = 'reporte@buildingwitheli.com';
@@ -243,6 +244,49 @@ async function subscribeToBeehiiv({ email }) {
   }
 }
 
+async function processReport(input) {
+  const ctx = { email: input.email, brand: input.brand };
+
+  // Step 1: Claude
+  let reportMd;
+  try {
+    reportMd = await callClaude(input);
+  } catch (err) {
+    console.error('[step:claude]', ctx, err.message);
+    throw err;
+  }
+
+  // Step 2: Markdown → PDF (con appendix estático "Vuélvelo semanal")
+  let pdfBuffer;
+  try {
+    const fullMd = reportMd + RECURRING_APPENDIX_MD;
+    const html = wrapHtml(marked.parse(fullMd), input.brand);
+    pdfBuffer = await renderPdf(html);
+  } catch (err) {
+    console.error('[step:pdf]', ctx, err.message);
+    throw err;
+  }
+
+  // Step 3: Resend
+  try {
+    await sendEmail({ to: input.email, brand: input.brand, pdfBuffer });
+  } catch (err) {
+    console.error('[step:resend]', ctx, err.message);
+    throw err;
+  }
+
+  // Step 4: Beehiiv (no rompe el flujo si falla)
+  if (input.subscribe) {
+    try {
+      await subscribeToBeehiiv({ email: input.email });
+    } catch (err) {
+      console.error('[step:beehiiv]', ctx, err.message);
+    }
+  }
+
+  console.log('[report:delivered]', ctx);
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -271,47 +315,18 @@ export default async function handler(req, res) {
     return res.status(400).json({ success: false, error: 'Correo inválido.' });
   }
 
-  // Step 1: Claude
-  let reportMd;
-  try {
-    reportMd = await callClaude({
+  // Respondemos al frontend de inmediato. El trabajo pesado sigue en background.
+  res.status(200).json({ success: true });
+
+  waitUntil(
+    processReport({
       brand, url, industry, geografia,
       comp1, comp2, comp3,
       objetivo: String(objetivo).trim(),
       idioma,
-    });
-  } catch (err) {
-    console.error('[step:claude]', err);
-    return res.status(500).json({ success: false, error: 'Falló la generación del reporte (Claude).' });
-  }
-
-  // Step 2: Markdown → PDF (con appendix estático "Vuélvelo semanal")
-  let pdfBuffer;
-  try {
-    const fullMd = reportMd + RECURRING_APPENDIX_MD;
-    const html = wrapHtml(marked.parse(fullMd), brand);
-    pdfBuffer = await renderPdf(html);
-  } catch (err) {
-    console.error('[step:pdf]', err);
-    return res.status(500).json({ success: false, error: 'Falló la generación del PDF.' });
-  }
-
-  // Step 3: Resend
-  try {
-    await sendEmail({ to: email, brand, pdfBuffer });
-  } catch (err) {
-    console.error('[step:resend]', err);
-    return res.status(500).json({ success: false, error: 'No pudimos enviar el correo.' });
-  }
-
-  // Step 4: Beehiiv (no rompe el flujo si falla)
-  if (subscribe) {
-    try {
-      await subscribeToBeehiiv({ email });
-    } catch (err) {
-      console.error('[step:beehiiv]', err);
-    }
-  }
-
-  return res.status(200).json({ success: true });
+      email, subscribe,
+    }).catch(err => {
+      console.error('[processReport:fatal]', { email, brand }, err.message);
+    })
+  );
 }
