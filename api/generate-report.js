@@ -213,7 +213,7 @@ buildingwitheli.com`,
 </div>`,
     attachments: [{
       filename: `market-intelligence-${slug(brand)}.pdf`,
-      content: pdfBuffer,
+      content: pdfBuffer.toString('base64'),
     }],
   });
 }
