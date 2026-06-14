@@ -104,6 +104,13 @@ async function callClaude(input) {
     model: CLAUDE_MODEL,
     max_tokens: 4000,
     system: loadSystemPrompt(),
+    tools: [
+      {
+        type: 'web_search_20250305',
+        name: 'web_search',
+        max_uses: 15,
+      },
+    ],
     messages: [{ role: 'user', content: buildUserMessage(input) }],
   });
   const text = msg.content
