@@ -2,7 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { Resend } from 'resend';
 import { marked } from 'marked';
 import puppeteer from 'puppeteer-core';
-import chromium from '@sparticuz/chromium';
+import chromium from '@sparticuz/chromium-min';
 import { waitUntil } from '@vercel/functions';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -13,6 +13,7 @@ const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 const FROM_EMAIL = 'reporte@buildingwitheli.com';
 const BEEHIIV_TAG = 'market-researcher';
 const PROMPT_URL = 'https://github.com/erivasf/buildingwitheli/blob/main/system-prompt.txt';
+const CHROMIUM_PACK_URL = 'https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar';
 
 const RECURRING_APPENDIX_MD = `
 
@@ -166,7 +167,7 @@ async function renderPdf(html) {
   const browser = await puppeteer.launch({
     args: chromium.args,
     defaultViewport: chromium.defaultViewport,
-    executablePath: await chromium.executablePath(),
+    executablePath: await chromium.executablePath(CHROMIUM_PACK_URL),
     headless: chromium.headless,
   });
   try {

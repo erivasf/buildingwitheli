@@ -4,7 +4,7 @@
   "functions": {
     "api/generate-report.js": {
       "maxDuration": 300,
-      "includeFiles": "{system-prompt.txt,node_modules/@sparticuz/chromium/bin/**}"
+      "includeFiles": "system-prompt.txt"
     }
   },
   "headers": [{

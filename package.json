@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.65.0",
-    "@sparticuz/chromium": "^131.0.1",
+    "@sparticuz/chromium-min": "^149.0.0",
     "@vercel/functions": "^3.7.1",
     "marked": "^14.1.4",
     "puppeteer-core": "^23.11.1",
