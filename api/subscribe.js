@@ -17,6 +17,32 @@ export default async function handler(req, res) {
     return res.status(400).json({ success: false, error: 'Correo inválido.' });
   }
 
+  // Airtable save (fire-and-forget)
+  const airtableKey = process.env.AIRTABLE_API_KEY;
+  const airtableBase = process.env.AIRTABLE_BASE_ID;
+  const airtableTable = process.env.AIRTABLE_TABLE_NAME || 'leads';
+  if (airtableKey && airtableBase) {
+    try {
+      const r = await fetch(
+        `https://api.airtable.com/v0/${airtableBase}/${encodeURIComponent(airtableTable)}`,
+        {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${airtableKey}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            records: [{ fields: { email, source: 'Newsletter Card', subscribed: true } }],
+            typecast: true,
+          }),
+        }
+      );
+      if (!r.ok) {
+        const t = await r.text().catch(() => '');
+        console.error('[subscribe:airtable]', r.status, t.slice(0, 200), 'email:', email);
+      }
+    } catch (err) {
+      console.error('[subscribe:airtable]', err.message, 'email:', email);
+    }
+  }
+
   const apiKey = process.env.BEEHIIV_API_KEY;
   const pubId = process.env.BEEHIIV_PUBLICATION_ID;
 

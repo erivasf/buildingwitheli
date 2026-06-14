@@ -11,7 +11,7 @@ export const config = { maxDuration: 300 };
 
 const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
 const FROM_EMAIL = 'reporte@buildingwitheli.com';
-const BEEHIIV_TAG = 'market-researcher';
+const BEEHIIV_TAG = 'Market Researcher';
 const PROMPT_URL = 'https://github.com/erivasf/buildingwitheli/blob/main/system-prompt.txt';
 const CHROMIUM_PACK_URL = 'https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar';
 
@@ -219,6 +219,32 @@ buildingwitheli.com`,
   });
 }
 
+async function saveToAirtable(data) {
+  const apiKey = process.env.AIRTABLE_API_KEY;
+  const baseId = process.env.AIRTABLE_BASE_ID;
+  const tableName = process.env.AIRTABLE_TABLE_NAME || 'leads';
+  if (!apiKey || !baseId) {
+    console.warn('[airtable] env vars missing, skipping save');
+    return;
+  }
+  const url = `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      records: [{ fields: data }],
+      typecast: true,
+    }),
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    throw new Error(`Airtable ${res.status}: ${body.slice(0, 200)}`);
+  }
+}
+
 async function subscribeToBeehiiv({ email }) {
   const apiKey = requireEnv('BEEHIIV_API_KEY');
   const pubId = requireEnv('BEEHIIV_PUBLICATION_ID');
@@ -277,7 +303,26 @@ async function processReport(input) {
     throw err;
   }
 
-  // Step 4: Beehiiv (no rompe el flujo si falla)
+  // Step 4: Airtable (no rompe el flujo si falla)
+  try {
+    await saveToAirtable({
+      email: input.email,
+      brand: input.brand,
+      url: input.url,
+      industry: input.industry,
+      geografia: input.geografia,
+      comp1: input.comp1 || '',
+      comp2: input.comp2 || '',
+      comp3: input.comp3 || '',
+      objetivo: input.objetivo || '',
+      source: 'Market Researcher',
+      subscribed: !!input.subscribe,
+    });
+  } catch (err) {
+    console.error('[step:airtable]', ctx, err.message);
+  }
+
+  // Step 5: Beehiiv (no rompe el flujo si falla)
   if (input.subscribe) {
     try {
       await subscribeToBeehiiv({ email: input.email });
