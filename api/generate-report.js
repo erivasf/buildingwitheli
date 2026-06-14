@@ -173,7 +173,8 @@ async function renderPdf(html) {
   try {
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'networkidle0' });
-    return await page.pdf({ format: 'A4', printBackground: true, preferCSSPageSize: true });
+    const pdf = await page.pdf({ format: 'A4', printBackground: true, preferCSSPageSize: true });
+    return Buffer.from(pdf); // puppeteer-core 23+ returns Uint8Array, normalize to Buffer
   } finally {
     await browser.close();
   }
