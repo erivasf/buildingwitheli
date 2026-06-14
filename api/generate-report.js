@@ -21,7 +21,7 @@ const RECURRING_APPENDIX_MD = `
 
 ## Vuélvelo semanal
 
-Un reporte aislado es útil. Una serie es una ventaja estructural. Tres formas de automatizar este flujo según tu nivel:
+Un reporte aislado es útil. Una serie es una ventaja estructural. Tres formas de automatizar este flujo según tu nivel técnico y herramientas que uses:
 
 ### Opción 1 · Claude Project (5 min, recomendado)
 
