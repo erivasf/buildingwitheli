@@ -84,7 +84,15 @@ function slug(s) {
 }
 
 function buildUserMessage(input) {
+  const fechaHoy = new Date().toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' });
   return [
+    `=== FECHA DE HOY: ${fechaHoy} ===`,
+    `Esta es tu única referencia temporal autoritativa.`,
+    `Cualquier evento anterior a esta fecha es pasado.`,
+    `No uses "esperado para Q3", "próximo año" ni proyecciones`,
+    `temporales sin verificar contra esta fecha primero.`,
+    ``,
+    `INPUTS:`,
     `Marca: ${input.brand}`,
     `URL: ${input.url}`,
     `Industria: ${input.industry}`,
@@ -94,7 +102,6 @@ function buildUserMessage(input) {
     `Competidor o referencia 3: ${input.comp3 || '(no especificado)'}`,
     `Idioma del reporte: ${input.idioma || 'Español'}`,
     `Objetivo de negocio: ${input.objetivo}`,
-    `Fecha de generación: ${new Date().toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' })}`,
   ].join('\n');
 }
 
