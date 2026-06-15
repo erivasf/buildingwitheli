@@ -84,7 +84,10 @@ function slug(s) {
 }
 
 function buildUserMessage(input) {
-  const fechaHoy = new Date().toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' });
+  const fechaHoy = new Date().toLocaleDateString('es-MX', {
+    day: '2-digit', month: 'long', year: 'numeric',
+    timeZone: 'America/Mexico_City',
+  });
   return [
     `=== FECHA DE HOY: ${fechaHoy} ===`,
     `Esta es tu única referencia temporal autoritativa.`,
@@ -128,7 +131,13 @@ async function callClaude(input) {
   return text;
 }
 
+function styleCitations(html) {
+  // Envuelve "(fuente: ...)" en un span para estilo footnote
+  return html.replace(/\(fuente:\s+([^)]+)\)/g, '<span class="cite">(fuente: $1)</span>');
+}
+
 function wrapHtml(markdownHtml, brand) {
+  const html = styleCitations(markdownHtml);
   return `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -145,23 +154,93 @@ function wrapHtml(markdownHtml, brand) {
   }
   .container { max-width: 720px; margin: 0 auto; }
   .header {
-    border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 24px;
+    border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 28px;
     display: flex; justify-content: space-between; align-items: baseline;
     font-size: 9pt; color: #999; letter-spacing: 0.04em;
   }
   .brand { font-weight: 600; color: #0f0f0f; }
   .accent { color: #ff4d00; }
-  h1 { color: #ff4d00; font-size: 20pt; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; margin: 0 0 6px; }
-  h2 { color: #0f0f0f; font-size: 14pt; font-weight: 700; letter-spacing: -0.01em; border-bottom: 2px solid #ff4d00; padding-bottom: 6px; margin: 22px 0 8px; }
-  h3 { color: #0f0f0f; font-size: 12pt; font-weight: 600; margin: 14px 0 4px; }
-  p { margin: 0 0 8px; }
-  ul, ol { margin: 0 0 10px 18px; padding: 0; }
-  li { margin-bottom: 4px; }
+
+  /* Headings */
+  h1 {
+    color: #ff4d00; font-size: 22pt; font-weight: 800;
+    letter-spacing: -0.025em; line-height: 1.05;
+    margin: 4px 0 10px;
+    break-after: avoid; page-break-after: avoid;
+  }
+  h2 {
+    color: #0f0f0f; font-size: 14pt; font-weight: 700;
+    letter-spacing: -0.01em;
+    border-bottom: 2px solid #ff4d00; padding-bottom: 6px;
+    margin: 26px 0 10px;
+    break-after: avoid; page-break-after: avoid;
+    break-inside: avoid; page-break-inside: avoid;
+  }
+  h3 {
+    color: #0f0f0f; font-size: 12pt; font-weight: 600;
+    margin: 16px 0 5px;
+    break-after: avoid; page-break-after: avoid;
+  }
+  h1 + p, h2 + p, h3 + p { margin-top: 0; }
+
+  /* Body */
+  p { margin: 0 0 8px; orphans: 2; widows: 2; }
   strong { color: #0f0f0f; }
   em { color: #555; font-style: italic; }
-  blockquote { color: #ff4d00; border-left: 2px solid #ff4d00; padding-left: 12px; margin: 10px 0; font-style: normal; }
-  hr { border: none; border-top: 1px solid #eee; margin: 18px 0; }
-  .footer { margin-top: 36px; padding-top: 12px; border-top: 1px solid #eee; font-size: 10pt; color: #999; text-align: center; letter-spacing: 0.04em; }
+  blockquote {
+    color: #ff4d00; border-left: 2px solid #ff4d00;
+    padding-left: 12px; margin: 10px 0; font-style: normal;
+    break-inside: avoid; page-break-inside: avoid;
+  }
+  hr { border: none; border-top: 1px solid #eee; margin: 20px 0; }
+
+  /* Lists — bullets normales */
+  ul { margin: 0 0 10px 18px; padding: 0; break-inside: avoid; page-break-inside: avoid; }
+  ul li { margin-bottom: 4px; break-inside: avoid; page-break-inside: avoid; }
+
+  /* Listas numeradas con número naranja */
+  ol {
+    counter-reset: item;
+    margin: 0 0 12px;
+    padding: 0; list-style: none;
+    break-inside: avoid; page-break-inside: avoid;
+  }
+  ol > li {
+    position: relative;
+    padding-left: 26px;
+    margin-bottom: 6px;
+    break-inside: avoid; page-break-inside: avoid;
+  }
+  ol > li::before {
+    counter-increment: item;
+    content: counter(item) ".";
+    position: absolute; left: 0; top: 0;
+    font-weight: 700; color: #ff4d00;
+    font-size: 0.95em;
+  }
+
+  /* Citations — estilo footnote sutil */
+  .cite {
+    font-size: 0.82em;
+    color: #888;
+    letter-spacing: 0.005em;
+  }
+  .cite a {
+    color: #888;
+    text-decoration: underline;
+    text-decoration-color: rgba(0,0,0,0.18);
+  }
+
+  /* Links generales */
+  a { color: #ff4d00; text-decoration: underline; text-decoration-color: rgba(255,77,0,0.3); }
+
+  /* Footer */
+  .footer {
+    margin-top: 40px; padding-top: 12px;
+    border-top: 1px solid #eee;
+    font-size: 9.5pt; color: #999;
+    text-align: center; letter-spacing: 0.04em;
+  }
 </style>
 </head>
 <body>
@@ -170,7 +249,7 @@ function wrapHtml(markdownHtml, brand) {
       <span class="brand">Building with Eli<span class="accent">.</span></span>
       <span>Market Researcher</span>
     </div>
-    ${markdownHtml}
+    ${html}
     <div class="footer">Generado por buildingwitheli.com · @buildingwitheli</div>
   </div>
 </body>

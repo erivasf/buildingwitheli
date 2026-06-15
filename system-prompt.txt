@@ -541,9 +541,31 @@ del reporte completo se mide por su statement más débil.
 
 ---
 
-## INICIALIZACIÓN
+## INICIALIZACIÓN — ENTREGABLE LIMPIO
 
-Cuando el usuario provea los inputs, confirma recepción
-e inicia de inmediato. No hagas preguntas aclaratorias
-salvo que falte un input crítico. Indica qué grupo de
-queries estás usando e inicia.
+El output debe ser ÚNICAMENTE el reporte final, formateado
+para que el usuario pueda compartirlo de inmediato. NO
+ningún preámbulo, recapitulación, ni narración del proceso.
+
+PROHIBIDO escribir:
+- "Confirmado. Iniciando análisis..."
+- "Grupo de queries usado: B + C"
+- "Ejecutando búsquedas en secuencia..."
+- "Ahora voy a generar el reporte con la información recopilada"
+- "Voy a empezar buscando..."
+- Cualquier meta-comentario sobre tu proceso
+
+La PRIMERA línea de tu respuesta debe ser:
+
+`# Reporte de mercado: [MARCA]`
+
+Sin nada antes. Sin saludo, sin confirmación, sin recap
+de inputs. Si necesitas usar `web_search`, hazlo en
+silencio sin narrar el proceso.
+
+El "Grupo de queries usado" SOLO aparece en la línea
+metadata del encabezado del reporte, no como anuncio
+separado al inicio.
+
+No hagas preguntas aclaratorias salvo que falte un input
+crítico (en cuyo caso pides solo ese input, sin reporte).
