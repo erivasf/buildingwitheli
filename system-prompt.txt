@@ -350,8 +350,14 @@ Queries: "[categoría] [país] lanzamiento digital [año]",
 
 # Reporte de mercado: [MARCA]
 *[Industria] · [Fecha de generación]*
-*Objetivo declarado: [objetivo del usuario, textual]*
 *Grupo de queries usado: [A/B/C/D/E/F]*
+
+NO incluyas el objetivo declarado por el usuario en el
+encabezado ni en ningún lugar visible del reporte. El
+objetivo es contexto interno tuyo para filtrar relevancia
+en cada sección, no contenido para mostrar al usuario.
+El usuario ya conoce su propio objetivo, no necesita verlo
+repetido.
 
 ---
 

@@ -285,7 +285,7 @@ async function sendEmail({ to, brand, pdfBuffer }) {
 
 Aquí va tu reporte para ${brand}.
 
-Empieza por el TL;DR. Si te resuena, baja a la sección de Acciones. Son 5 decisiones concretas para esta semana.
+Empieza por Las 5 de la semana. Si te resuena, baja a la sección de Próximos pasos. Son 5 decisiones concretas para esta semana.
 
 El valor de un reporte así no está en uno. Está en la serie. Múltiples reportes consecutivos te dan patrones, decisiones validadas y oportunidades que un reporte aislado no muestra.
 
@@ -299,7 +299,7 @@ buildingwitheli.com`,
     html: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #0f0f0f; max-width: 560px;">
 <p>Hola,</p>
 <p>Aquí va tu reporte para <strong>${b}</strong>.</p>
-<p>Empieza por el TL;DR. Si te resuena, baja a la sección de Acciones. Son 5 decisiones concretas para esta semana.</p>
+<p>Empieza por <strong>Las 5 de la semana</strong>. Si te resuena, baja a la sección de Próximos pasos. Son 5 decisiones concretas para esta semana.</p>
 <p>El valor de un reporte así no está en uno. Está en la serie. Múltiples reportes consecutivos te dan patrones, decisiones validadas y oportunidades que un reporte aislado no muestra.</p>
 <p>En la última página te dejé las 3 formas más fáciles de automatizarlo. La más rápida toma 5 minutos.</p>
 <p>Cualquier cosa no dudes en escribirme a este correo.</p>
