@@ -315,7 +315,7 @@ buildingwitheli.com`,
 async function saveToAirtable(data) {
   const apiKey = process.env.AIRTABLE_API_KEY;
   const baseId = process.env.AIRTABLE_BASE_ID;
-  const tableName = process.env.AIRTABLE_TABLE_NAME || 'leads';
+  const tableName = process.env.AIRTABLE_TABLE_NAME || 'Leads';
   if (!apiKey || !baseId) {
     console.warn('[airtable] env vars missing, skipping save');
     return;

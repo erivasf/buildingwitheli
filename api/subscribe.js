@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   // Airtable save (fire-and-forget)
   const airtableKey = process.env.AIRTABLE_API_KEY;
   const airtableBase = process.env.AIRTABLE_BASE_ID;
-  const airtableTable = process.env.AIRTABLE_TABLE_NAME || 'leads';
+  const airtableTable = process.env.AIRTABLE_TABLE_NAME || 'Leads';
   if (airtableKey && airtableBase) {
     try {
       const r = await fetch(
