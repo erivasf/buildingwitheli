@@ -374,35 +374,9 @@ async function subscribeToBeehiiv({ email }) {
 async function processReport(input) {
   const ctx = { email: maskEmail(input.email), brand: input.brand };
 
-  // Step 1: Claude
-  let reportMd;
-  try {
-    reportMd = await callClaude(input);
-  } catch (err) {
-    console.error('[step:claude]', ctx, err.message);
-    throw err;
-  }
-
-  // Step 2: Markdown → PDF (con appendix estático "Vuélvelo semanal")
-  let pdfBuffer;
-  try {
-    const fullMd = reportMd + RECURRING_APPENDIX_MD;
-    const html = wrapHtml(marked.parse(fullMd), input.brand);
-    pdfBuffer = await renderPdf(html);
-  } catch (err) {
-    console.error('[step:pdf]', ctx, err.message);
-    throw err;
-  }
-
-  // Step 3: Resend
-  try {
-    await sendEmail({ to: input.email, brand: input.brand, pdfBuffer });
-  } catch (err) {
-    console.error('[step:resend]', ctx, err.message);
-    throw err;
-  }
-
-  // Step 4: Airtable (no rompe el flujo si falla)
+  // Step 1: Airtable PRIMERO — captura el lead antes del trabajo pesado.
+  // Si algún paso posterior falla, al menos el contacto + inputs quedan
+  // guardados para hacer outreach manual o reprocesar.
   try {
     await saveToAirtable({
       email: input.email,
@@ -421,13 +395,42 @@ async function processReport(input) {
     console.error('[step:airtable]', ctx, err.message);
   }
 
-  // Step 5: Beehiiv (no rompe el flujo si falla)
+  // Step 2: Beehiiv subscribe (también antes de Claude para que la
+  // suscripción no se pierda si el reporte falla)
   if (input.subscribe) {
     try {
       await subscribeToBeehiiv({ email: input.email });
     } catch (err) {
       console.error('[step:beehiiv]', ctx, err.message);
     }
+  }
+
+  // Step 3: Claude
+  let reportMd;
+  try {
+    reportMd = await callClaude(input);
+  } catch (err) {
+    console.error('[step:claude]', ctx, err.message);
+    throw err;
+  }
+
+  // Step 4: Markdown → PDF (con appendix estático "Vuélvelo semanal")
+  let pdfBuffer;
+  try {
+    const fullMd = reportMd + RECURRING_APPENDIX_MD;
+    const html = wrapHtml(marked.parse(fullMd), input.brand);
+    pdfBuffer = await renderPdf(html);
+  } catch (err) {
+    console.error('[step:pdf]', ctx, err.message);
+    throw err;
+  }
+
+  // Step 5: Resend
+  try {
+    await sendEmail({ to: input.email, brand: input.brand, pdfBuffer });
+  } catch (err) {
+    console.error('[step:resend]', ctx, err.message);
+    throw err;
   }
 
   console.log('[report:delivered]', ctx);
