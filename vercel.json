@@ -5,6 +5,10 @@
     "api/generate-report.js": {
       "maxDuration": 300,
       "includeFiles": "system-prompt.txt"
+    },
+    "api/admin/retry.js": {
+      "maxDuration": 300,
+      "includeFiles": "system-prompt.txt"
     }
   },
   "headers": [{

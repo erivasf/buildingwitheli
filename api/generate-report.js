@@ -317,10 +317,34 @@ buildingwitheli.com`,
   });
 }
 
+function airtableEnv() {
+  return {
+    apiKey: process.env.AIRTABLE_API_KEY,
+    baseId: process.env.AIRTABLE_BASE_ID,
+    tableName: process.env.AIRTABLE_TABLE_NAME || 'Leads',
+  };
+}
+
+export async function findLeadByEmail(email) {
+  const { apiKey, baseId, tableName } = airtableEnv();
+  if (!apiKey || !baseId) throw new Error('Airtable env vars missing.');
+  // Airtable filterByFormula expects: {email}="value"
+  const safe = String(email).replace(/"/g, '\\"');
+  const formula = encodeURIComponent(`{email}="${safe}"`);
+  const url = `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}?filterByFormula=${formula}&maxRecords=1`;
+  const res = await fetchWithRetry(url, {
+    headers: { 'Authorization': `Bearer ${apiKey}` },
+  }, { timeoutMs: 10000, maxRetries: 1 });
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    throw new Error(`Airtable lookup ${res.status}: ${body.slice(0, 200)}`);
+  }
+  const data = await res.json();
+  return data.records?.[0] || null;
+}
+
 async function saveToAirtable(data) {
-  const apiKey = process.env.AIRTABLE_API_KEY;
-  const baseId = process.env.AIRTABLE_BASE_ID;
-  const tableName = process.env.AIRTABLE_TABLE_NAME || 'Leads';
+  const { apiKey, baseId, tableName } = airtableEnv();
   if (!apiKey || !baseId) {
     console.warn('[airtable] env vars missing, skipping save');
     return;
@@ -371,33 +395,33 @@ async function subscribeToBeehiiv({ email }) {
   }
 }
 
-async function processReport(input) {
-  const ctx = { email: maskEmail(input.email), brand: input.brand };
+export async function processReport(input, opts = {}) {
+  const ctx = { email: maskEmail(input.email), brand: input.brand, ...(opts.tag ? { tag: opts.tag } : {}) };
 
   // Step 1: Airtable PRIMERO — captura el lead antes del trabajo pesado.
-  // Si algún paso posterior falla, al menos el contacto + inputs quedan
-  // guardados para hacer outreach manual o reprocesar.
-  try {
-    await saveToAirtable({
-      email: input.email,
-      brand: input.brand,
-      url: input.url,
-      industry: input.industry,
-      geografia: input.geografia,
-      comp1: input.comp1 || '',
-      comp2: input.comp2 || '',
-      comp3: input.comp3 || '',
-      objetivo: input.objetivo || '',
-      source: 'Market Researcher',
-      subscribed: !!input.subscribe,
-    });
-  } catch (err) {
-    console.error('[step:airtable]', ctx, err.message);
+  // En retry se salta (el lead ya existe).
+  if (!opts.skipAirtable) {
+    try {
+      await saveToAirtable({
+        email: input.email,
+        brand: input.brand,
+        url: input.url,
+        industry: input.industry,
+        geografia: input.geografia,
+        comp1: input.comp1 || '',
+        comp2: input.comp2 || '',
+        comp3: input.comp3 || '',
+        objetivo: input.objetivo || '',
+        source: 'Market Researcher',
+        subscribed: !!input.subscribe,
+      });
+    } catch (err) {
+      console.error('[step:airtable]', ctx, err.message);
+    }
   }
 
-  // Step 2: Beehiiv subscribe (también antes de Claude para que la
-  // suscripción no se pierda si el reporte falla)
-  if (input.subscribe) {
+  // Step 2: Beehiiv subscribe. En retry se salta (ya están suscritos).
+  if (input.subscribe && !opts.skipBeehiiv) {
     try {
       await subscribeToBeehiiv({ email: input.email });
     } catch (err) {
