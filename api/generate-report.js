@@ -13,7 +13,7 @@ import {
 
 export const config = { maxDuration: 300 };
 
-const CLAUDE_MODEL = 'claude-sonnet-4-20250514';
+const CLAUDE_MODEL = 'claude-sonnet-4-6';
 const FROM_EMAIL = 'reporte@buildingwitheli.com';
 const BEEHIIV_TAG = 'Market Researcher';
 const PROMPT_URL = 'https://github.com/erivasf/buildingwitheli/blob/main/system-prompt.txt';
