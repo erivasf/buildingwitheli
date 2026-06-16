@@ -78,8 +78,8 @@ export default async function handler(req, res) {
     subscribe: !!f.subscribed,
   };
 
-  // Validación mínima de los campos rescatados
-  if (!input.brand || !input.url || !input.industry || !input.geografia || !input.comp1 || !input.objetivo) {
+  // Validación mínima de los campos rescatados (url es opcional)
+  if (!input.brand || !input.industry || !input.geografia || !input.comp1 || !input.objetivo) {
     return res.status(422).json({
       success: false,
       error: 'Lead encontrado pero le faltan campos requeridos para regenerar el reporte.',

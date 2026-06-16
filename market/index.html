@@ -154,6 +154,12 @@ h1.market-title .accent { color: var(--neon); }
   font-family: var(--mono); font-size: 10px;
   color: var(--ink3); letter-spacing: 0.08em; text-transform: uppercase;
 }
+.field-optional {
+  font-family: var(--mono); font-size: 9px;
+  color: var(--ink3); opacity: 0.7;
+  text-transform: none; letter-spacing: 0.04em;
+  margin-left: 4px;
+}
 .field input,
 .field select,
 .field textarea {
@@ -441,8 +447,8 @@ footer {
         <input type="text" id="brand" name="brand" required placeholder="Tu empresa">
       </div>
       <div class="field">
-        <label for="url">URL</label>
-        <input type="url" id="url" name="url" required placeholder="https://tuempresa.com">
+        <label for="url">URL <span class="field-optional">(opcional)</span></label>
+        <input type="url" id="url" name="url" placeholder="https://tuempresa.com (si ya tienes)">
       </div>
       <div class="field">
         <label for="industry">Industria</label>
@@ -729,8 +735,7 @@ marketForm.addEventListener('submit', e => {
 
   let hasError = false;
   if (!brand)    { showError('brand', 'Requerido.'); hasError = true; }
-  if (!url)      { showError('url', 'Requerido.'); hasError = true; }
-  else if (!/^https?:\/\/.+\..+/i.test(url)) { showError('url', 'Incluye http:// o https://'); hasError = true; }
+  if (url && !/^https?:\/\/.+\..+/i.test(url)) { showError('url', 'Si la incluyes, debe empezar con http:// o https://'); hasError = true; }
   if (!industry) { showError('industry', 'Requerido.'); hasError = true; }
   if (!selectedCountry) {
     showError('geografia', geoInput.value.trim() ? 'Selecciona un país de la lista.' : 'Requerido.');
